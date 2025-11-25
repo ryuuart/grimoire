@@ -1,0 +1,12 @@
+{
+  "dependencies": [
+    "boost-asio",
+    {
+      "name": "imgui",
+      "features": ["metal-binding", "sdl3-binding", "sdlgpu3-binding"]
+    },
+    "skia",
+    "spdlog",
+    "sdl3"
+  ]
+}

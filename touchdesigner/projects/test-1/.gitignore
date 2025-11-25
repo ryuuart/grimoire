@@ -1,0 +1,14 @@
+# caches
+.cache/
+
+# build artifacts
+build/
+
+# vcpkg
+vcpkg_installed/
+
+# imgui
+imgui.ini
+
+# CMake
+CMakeUserPresets.json
