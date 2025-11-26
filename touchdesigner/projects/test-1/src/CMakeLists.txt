@@ -35,8 +35,16 @@ add_library(CanvasTOP MODULE
     CanvasTOP.cpp
 )
 
+set_target_properties(CanvasTOP PROPERTIES
+    BUNDLE TRUE
+    BUNDLE_EXTENSION "plugin"
+    PREFIX ""
+    LINKER_LANGUAGE CXX
+)
+
 target_link_libraries(CanvasTOP
     PRIVATE
         Canvas
         touchdesigner::Top
+        spdlog::spdlog
 )
