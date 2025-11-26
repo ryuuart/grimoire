@@ -1,7 +1,6 @@
 #ifndef CANVAS_H
 #define CANVAS_H
 
-#include <SDL3/SDL_gpu.h>
 #include <functional>
 #include <include/core/SkCanvas.h>
 #include <include/core/SkPixmap.h>

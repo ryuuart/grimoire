@@ -4,28 +4,39 @@ find_package(spdlog CONFIG REQUIRED)
 find_package(SDL3 CONFIG REQUIRED)
 find_package(touchdesigner CONFIG REQUIRED)
 
-qt_add_executable(Test
-    main.cpp
+add_library(Canvas STATIC
     Canvas.cpp
-    SdlDrawable.cpp
 )
 
-target_include_directories(Test
-    PRIVATE
+target_include_directories(Canvas
+    PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-target_link_libraries(Test
-    PRIVATE
+target_link_libraries(Canvas
+    PUBLIC
         unofficial::skia::skia
-        Qt6::Core
+)
+
+add_executable(CanvasTOPTool
+    main.cpp
+    SdlDrawable.cpp
+)
+
+target_link_libraries(CanvasTOPTool
+    PRIVATE
+        Canvas
         imgui::imgui
         spdlog::spdlog
         SDL3::SDL3
-        touchdesigner::Top
 )
 
-target_compile_options(Test
+add_library(CanvasTOP MODULE
+    CanvasTOP.cpp
+)
+
+target_link_libraries(CanvasTOP
     PRIVATE
-        -objc-arc
+        Canvas
+        touchdesigner::Top
 )
