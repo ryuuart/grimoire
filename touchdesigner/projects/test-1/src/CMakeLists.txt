@@ -2,9 +2,12 @@ find_package(unofficial-skia CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(SDL3 CONFIG REQUIRED)
+find_package(touchdesigner CONFIG REQUIRED)
 
 qt_add_executable(Test
     main.cpp
+    Canvas.cpp
+    SdlDrawable.cpp
 )
 
 target_include_directories(Test
@@ -19,6 +22,7 @@ target_link_libraries(Test
         imgui::imgui
         spdlog::spdlog
         SDL3::SDL3
+        touchdesigner::Top
 )
 
 target_compile_options(Test

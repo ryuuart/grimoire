@@ -1,0 +1,4 @@
+touchdesigner-custom-operators provides CMake targets:
+
+    find_package(touchdesigner CONFIG REQUIRED)
+    target_link_lbiraries(main PRIVATE touchdesigner::touchdesigner)
