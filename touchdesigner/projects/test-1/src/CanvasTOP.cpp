@@ -7,6 +7,8 @@
 #include "include/core/SkSurface.h"
 #include <CPlusPlus_Common.h>
 #include <TOP_CPlusPlusBase.h>
+#include <include/core/SkMatrix.h>
+#include <optional>
 
 extern "C" {
 void FillTOPPluginInfo(TOP_PluginInfo *info) {
@@ -39,29 +41,28 @@ TOP_CPlusPlusBase *CreateTOPInstance(const OP_NodeInfo *info,
 }
 
 CanvasTOP::CanvasTOP(const OP_NodeInfo *info, TOP_Context *context)
-    : m_canvas{640, 480}, m_context{context}, m_info{info} {}
+    : m_canvas{128, 128}, m_context{context}, m_info{info} {}
 
 CanvasTOP::~CanvasTOP() {}
 
 void CanvasTOP::getGeneralInfo(TOP_GeneralInfo *ginfo, const OP_Inputs *inputs,
                                void *reserved1) {
-    ginfo->cookEveryFrame = false;
+    ginfo->cookEveryFrame = true;
     ginfo->inputSizeIndex = 0;
 }
 
 void CanvasTOP::execute(TOP_Output *output, const OP_Inputs *inputs,
                         void *reserved) {
-    // if (inputs->getNumInputs() < 1) {
-    //     spdlog::warn("CanvasTOP: No input connected.");
-    //     return;
-    // }
-
-    // const OP_TOPInput *input = inputs->getInputTOP(0);
-    // if (input == nullptr || input->width == 0 || input->height == 0) {
-    //     spdlog::warn("CanvasTOP: Invalid input TOP.");
-    //     return;
-    // }
-
+    std::optional<float> scaleValue = std::nullopt;
+    const OP_CHOPInput *scaleInput = m_parameters.evalScale(inputs);
+    if (scaleInput) {
+        scaleValue =
+            scaleInput->getChannelData(0)[0]
+                ? std::optional<float>(scaleInput->getChannelData(0)[0])
+                : std::nullopt;
+    }
+    int count = m_parameters.evalCount(inputs);
+    double rotation = m_parameters.evalRotation(inputs);
     m_canvas.draw([&](SkCanvas *canvas) {
         const SkScalar scale = 256.0f;
         const SkScalar R = 0.45f * scale;
@@ -76,9 +77,18 @@ void CanvasTOP::execute(TOP_Output *output, const OP_Inputs *inputs,
         SkPaint p;
         p.setAntiAlias(true);
         canvas->clear(SK_ColorBLUE);
-        path.transform(
-            SkMatrix::Translate(SkVector{0.5f * scale, 0.5f * scale}));
-        canvas->drawPath(path.detach(), p);
+        for (int i = 0; i < count; i++) {
+            float xrand = rand() % 10;
+            float yrand = rand() % 10;
+            // path.transform(SkMatrix::Translate(
+            //     SkVector{0.5f * scale * xrand, 0.5f * scale * yrand}));
+            path.transform(
+                SkMatrix::Translate(SkVector{0.5f * scale, 0.5f * scale}));
+            canvas->drawPath(path.detach(), p);
+        }
+        auto tmpScale = scaleValue.value_or(1.0f);
+        canvas->scale(tmpScale, tmpScale);
+        canvas->rotate(rotation);
     });
 
     const SkPixmap &pixmap = m_canvas.getPixmap();
@@ -92,7 +102,7 @@ void CanvasTOP::execute(TOP_Output *output, const OP_Inputs *inputs,
     TOP_UploadInfo uploadInfo = {};
     uploadInfo.textureDesc.width = pixmap.width();
     uploadInfo.textureDesc.height = pixmap.height();
-    uploadInfo.textureDesc.pixelFormat = OP_PixelFormat::RGBA8Fixed;
+    uploadInfo.textureDesc.pixelFormat = OP_PixelFormat::BGRA8Fixed;
     uploadInfo.textureDesc.texDim = OP_TexDim::e2D;
     uploadInfo.firstPixel = TOP_FirstPixel::TopLeft;
     uploadInfo.colorBufferIndex = 0;
@@ -101,5 +111,5 @@ void CanvasTOP::execute(TOP_Output *output, const OP_Inputs *inputs,
 }
 
 void CanvasTOP::setupParameters(OP_ParameterManager *manager, void *reserved1) {
-    // No custom parameters for now
+    m_parameters.setup(manager);
 }

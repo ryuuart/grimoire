@@ -12,6 +12,7 @@ class Canvas {
     Canvas(double width, double height);
 
     void draw(const std::function<void(SkCanvas *canvas)> &);
+    void updateSize(int width, int height);
     const SkPixmap &getPixmap();
 
   private:

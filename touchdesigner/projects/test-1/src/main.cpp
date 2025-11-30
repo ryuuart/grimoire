@@ -5,6 +5,7 @@
 #include <SDL3/SDL_oldnames.h>
 #include <SDL3/SDL_properties.h>
 #include <cstring>
+#include <include/core/SkColor.h>
 #include <include/core/SkMatrix.h>
 #include <include/core/SkPixmap.h>
 #include <include/private/base/SkPoint_impl.h>
@@ -41,12 +42,13 @@ struct SdlContext {
     SDL_GPUDevice *gpuDevice;
 };
 
-struct SkiaContext {};
+struct SkiaContext {
+    Canvas canvas{0.0, 0.0};
+};
 
 struct AppContext {
     SdlContext sdlContext;
     SkiaContext skiaContext;
-    Canvas canvas;
 };
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
@@ -115,12 +117,13 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
         SDL_GetGPUSwapchainTextureFormat(gpu_device, window);
     ImGui_ImplSDLGPU3_Init(&init_info);
 
-    SkiaContext skiaContext{};
+    SkiaContext skiaContext{
+        .canvas = Canvas{window_size.first, window_size.second},
+    };
 
     *appstate = new AppContext{
         .sdlContext = SdlContext{.window = window, .gpuDevice = gpu_device},
         .skiaContext = skiaContext,
-        .canvas = Canvas{window_size.first, window_size.second},
     };
 
     return SDL_APP_CONTINUE;
@@ -134,7 +137,7 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
     bool show_demo_window = true;
 
-    appContext->canvas.draw([](SkCanvas *canvas) {
+    skiaContext.canvas.draw([](SkCanvas *canvas) {
         const SkScalar scale = 256.0f;
         const SkScalar R = 0.45f * scale;
         const SkScalar TAU = 6.2831853f;
@@ -153,7 +156,7 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
         canvas->drawPath(path.detach(), p);
     });
 
-    SkPixmap pixmap = appContext->canvas.getPixmap();
+    SkPixmap pixmap = skiaContext.canvas.getPixmap();
     SdlDrawable::SdlDrawableDescriptor drawableDescriptor{
         .buffer = pixmap.addr(),
         .sizeInBytes = pixmap.computeByteSize(),
@@ -214,7 +217,19 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
 }
 
 SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
-    if (event->type == SDL_EVENT_QUIT) {
+    AppContext *appContext = static_cast<AppContext *>(appstate);
+    SdlContext &sdlContext = appContext->sdlContext;
+    SkiaContext &skiaContext = appContext->skiaContext;
+    SDL_Window *window = sdlContext.window;
+
+    switch (event->type) {
+    case SDL_EVENT_WINDOW_RESIZED: {
+        int width = event->window.data1, height = event->window.data2;
+        SDL_SetWindowSize(window, width, height);
+        skiaContext.canvas.updateSize(width, height);
+        break;
+    }
+    case SDL_EVENT_QUIT:
         return SDL_APP_SUCCESS;
     }
     ImGui_ImplSDL3_ProcessEvent(event);

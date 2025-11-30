@@ -9,7 +9,7 @@
       "command": "cmake --build --preset main build",
       "cwd": "$ZED_WORKTREE_ROOT"
     },
-    "program": "$ZED_WORKTREE_ROOT/build/src/Debug/CanvasTOPTool",
+    "program": "$ZED_WORKTREE_ROOT/build/bin/Debug/CanvasTOPTool",
     "request": "launch",
     "adapter": "CodeLLDB"
   }

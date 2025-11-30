@@ -33,6 +33,7 @@ target_link_libraries(CanvasTOPTool
 
 add_library(CanvasTOP MODULE
     CanvasTOP.cpp
+    Parameters.cpp
 )
 
 set_target_properties(CanvasTOP PROPERTIES

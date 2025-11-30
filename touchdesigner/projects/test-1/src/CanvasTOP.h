@@ -1,4 +1,5 @@
 #include "Canvas.h"
+#include "Parameters.h"
 #include <CPlusPlus_Common.h>
 #include <TOP_CPlusPlusBase.h>
 
@@ -25,6 +26,7 @@ class CanvasTOP : public TOP_CPlusPlusBase {
     OP_SmartRef<OP_TOPDownloadResult> m_prev_down_res;
 
     const OP_NodeInfo *m_info;
+    Parameters m_parameters;
 };
 
 #endif
