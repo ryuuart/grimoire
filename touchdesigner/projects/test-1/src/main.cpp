@@ -4,11 +4,14 @@
 #include <SDL3/SDL_metal.h>
 #include <SDL3/SDL_oldnames.h>
 #include <SDL3/SDL_properties.h>
+#include <SDL3/SDL_stdinc.h>
 #include <cstring>
 #include <include/core/SkColor.h>
+#include <include/core/SkFontMgr.h>
 #include <include/core/SkMatrix.h>
 #include <include/core/SkPixmap.h>
 #include <include/private/base/SkPoint_impl.h>
+#include <string>
 #define SDL_MAIN_USE_CALLBACKS
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_error.h>
@@ -29,6 +32,8 @@
 
 // Skia
 #include "include/core/SkCanvas.h"
+#include "include/core/SkFont.h"
+#include "include/core/SkFontStyle.h"
 #include "include/core/SkImage.h"
 #include "include/core/SkPaint.h"
 #include "include/core/SkPathBuilder.h"
@@ -40,6 +45,7 @@
 struct SdlContext {
     SDL_Window *window;
     SDL_GPUDevice *gpuDevice;
+    Uint64 totalTime;
 };
 
 struct SkiaContext {
@@ -50,6 +56,8 @@ struct AppContext {
     SdlContext sdlContext;
     SkiaContext skiaContext;
 };
+
+constexpr double TARGET_FPS = 1.0f / 60.0f;
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
     spdlog::info("Initializing SDL App...");
@@ -117,8 +125,11 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
         SDL_GetGPUSwapchainTextureFormat(gpu_device, window);
     ImGui_ImplSDLGPU3_Init(&init_info);
 
+    int pixelWindowWidth, pixelWindowHeight;
+    SDL_GetWindowSizeInPixels(window, &pixelWindowWidth, &pixelWindowHeight);
     SkiaContext skiaContext{
-        .canvas = Canvas{window_size.first, window_size.second},
+        .canvas = Canvas{static_cast<double>(pixelWindowWidth),
+                         static_cast<double>(pixelWindowHeight)},
     };
 
     *appstate = new AppContext{
@@ -137,7 +148,9 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
     bool show_demo_window = true;
 
-    skiaContext.canvas.draw([](SkCanvas *canvas) {
+    sdlContext.totalTime += 20;
+
+    skiaContext.canvas.draw([&sdlContext, &skiaContext](SkCanvas *canvas) {
         const SkScalar scale = 256.0f;
         const SkScalar R = 0.45f * scale;
         const SkScalar TAU = 6.2831853f;
@@ -151,9 +164,26 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
         SkPaint p;
         p.setAntiAlias(true);
         canvas->clear(SK_ColorBLUE);
+        path.transform(SkMatrix::RotateDeg(sdlContext.totalTime * 0.01));
         path.transform(
             SkMatrix::Translate(SkVector{0.5f * scale, 0.5f * scale}));
+        auto finalPath = path.detach();
+        for (int i = 0; i < 5; i++) {
+            canvas->drawPath(finalPath, p);
+            finalPath.transform(SkMatrix::Translate(i * 100, i * 100));
+        }
         canvas->drawPath(path.detach(), p);
+
+        sk_sp<SkTypeface> typeface =
+            skiaContext.canvas.getFontManager()->matchFamilyStyle(
+                "Akzidenz-Grotesk Next", SkFontStyle());
+        SkFont font{typeface, 32};
+        for (int i = 0; i < 10; i++) {
+            canvas->drawString((std::string{"Testerino! "} +
+                                std::to_string(sdlContext.totalTime * 0.5 * i))
+                                   .c_str(),
+                               10, (i + 1) * 64, font, p);
+        }
     });
 
     SkPixmap pixmap = skiaContext.canvas.getPixmap();
@@ -224,8 +254,8 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
 
     switch (event->type) {
     case SDL_EVENT_WINDOW_RESIZED: {
-        int width = event->window.data1, height = event->window.data2;
-        SDL_SetWindowSize(window, width, height);
+        int width, height;
+        SDL_GetWindowSizeInPixels(window, &width, &height);
         skiaContext.canvas.updateSize(width, height);
         break;
     }

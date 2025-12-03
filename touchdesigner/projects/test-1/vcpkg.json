@@ -5,7 +5,10 @@
       "name": "imgui",
       "features": ["metal-binding", "sdl3-binding", "sdlgpu3-binding"]
     },
-    "skia",
+    {
+      "name": "skia",
+      "features": ["metal", "graphite", "harfbuzz", "icu", "fontconfig"]
+    },
     "spdlog",
     "sdl3",
     "touchdesigner-custom-operators"
