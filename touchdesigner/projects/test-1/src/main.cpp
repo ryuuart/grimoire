@@ -125,12 +125,10 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
         SDL_GetGPUSwapchainTextureFormat(gpu_device, window);
     ImGui_ImplSDLGPU3_Init(&init_info);
 
-    int pixelWindowWidth, pixelWindowHeight;
-    SDL_GetWindowSizeInPixels(window, &pixelWindowWidth, &pixelWindowHeight);
-    SkiaContext skiaContext{
-        .canvas = Canvas{static_cast<double>(pixelWindowWidth),
-                         static_cast<double>(pixelWindowHeight)},
-    };
+    float pixelDensity = SDL_GetWindowPixelDensity(window);
+    SkiaContext skiaContext{.canvas =
+                                Canvas{window_size.first * pixelDensity,
+                                       window_size.second * pixelDensity}};
 
     *appstate = new AppContext{
         .sdlContext = SdlContext{.window = window, .gpuDevice = gpu_device},
@@ -218,8 +216,8 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
         nullptr); // Acquire a swapchain texture
 
     if (swapchain_texture != nullptr && !is_minimized) {
-        // This is mandatory: call ImGui_ImplSDLGPU3_PrepareDrawData() to upload
-        // the vertex/index buffer!
+        // This is mandatory: call ImGui_ImplSDLGPU3_PrepareDrawData() to
+        // upload the vertex/index buffer!
         Imgui_ImplSDLGPU3_PrepareDrawData(draw_data, command_buffer);
         skiaDrawable.upload(command_buffer, swapchain_texture);
 
@@ -254,9 +252,12 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
 
     switch (event->type) {
     case SDL_EVENT_WINDOW_RESIZED: {
+        float pixelDensity = SDL_GetWindowPixelDensity(window);
         int width, height;
-        SDL_GetWindowSizeInPixels(window, &width, &height);
-        skiaContext.canvas.updateSize(width, height);
+        width = event->window.data1;
+        height = event->window.data2;
+        skiaContext.canvas.updateSize(width * pixelDensity,
+                                      height * pixelDensity);
         break;
     }
     case SDL_EVENT_QUIT:
