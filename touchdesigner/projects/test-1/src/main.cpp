@@ -1,34 +1,27 @@
 #include "Canvas.h"
 #include "SdlDrawable.h"
-#include <SDL3/SDL_gpu.h>
-#include <SDL3/SDL_metal.h>
-#include <SDL3/SDL_oldnames.h>
-#include <SDL3/SDL_properties.h>
-#include <SDL3/SDL_stdinc.h>
+#include "SDL3/SDL_gpu.h"
+#include "SDL3/SDL_stdinc.h"
 #include <cstring>
-#include <include/core/SkColor.h>
-#include <include/core/SkFontMgr.h>
-#include <include/core/SkMatrix.h>
-#include <include/core/SkPixmap.h>
-#include <include/private/base/SkPoint_impl.h>
+#include "include/core/SkColor.h"
+#include "include/core/SkFontMgr.h"
+#include "include/core/SkMatrix.h"
+#include "include/core/SkPixmap.h"
+#include "include/private/base/SkPoint_impl.h"
 #include <string>
 #define SDL_MAIN_USE_CALLBACKS
-#include <SDL3/SDL.h>
-#include <SDL3/SDL_error.h>
-#include <SDL3/SDL_events.h>
-#include <SDL3/SDL_init.h>
-#include <SDL3/SDL_log.h>
-#include <SDL3/SDL_main.h>
-#include <SDL3/SDL_render.h>
-#include <SDL3/SDL_timer.h>
-#include <SDL3/SDL_video.h>
+#include "SDL3/SDL.h"
+#include "SDL3/SDL_error.h"
+#include "SDL3/SDL_events.h"
+#include "SDL3/SDL_init.h"
+#include "SDL3/SDL_main.h"
+#include "SDL3/SDL_video.h"
 
 #define IMGUI_USER_CONFIG "imconfig_overlay.h"
-#include <imgui.h>
-#include <imgui_impl_metal.h>
-#include <imgui_impl_sdl3.h>
-#include <imgui_impl_sdlgpu3.h>
-#include <spdlog/spdlog.h>
+#include "imgui.h"
+#include "imgui_impl_sdl3.h"
+#include "imgui_impl_sdlgpu3.h"
+#include "spdlog/spdlog.h"
 
 // Skia
 #include "include/core/SkCanvas.h"
@@ -61,6 +54,7 @@ constexpr double TARGET_FPS = 1.0f / 60.0f;
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
     spdlog::info("Initializing SDL App...");
+    spdlog::info(IMGUI_USER_CONFIG);
     SDL_SetAppMetadata("Skia + imgui test proj", "0.1.0", nullptr);
 
     if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD)) {
@@ -180,7 +174,7 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
             canvas->drawString((std::string{"Testerino! "} +
                                 std::to_string(sdlContext.totalTime * 0.5 * i))
                                    .c_str(),
-                               10, (i + 1) * 64, font, p);
+                               10, (i + 1) * 20, font, p);
         }
     });
 
@@ -218,7 +212,7 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
     if (swapchain_texture != nullptr && !is_minimized) {
         // This is mandatory: call ImGui_ImplSDLGPU3_PrepareDrawData() to
         // upload the vertex/index buffer!
-        Imgui_ImplSDLGPU3_PrepareDrawData(draw_data, command_buffer);
+        ImGui_ImplSDLGPU3_PrepareDrawData(draw_data, command_buffer);
         skiaDrawable.upload(command_buffer, swapchain_texture);
 
         // Setup and start a render pass

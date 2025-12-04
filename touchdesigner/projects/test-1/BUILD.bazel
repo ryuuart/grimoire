@@ -1,0 +1,15 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary")
+
+cc_binary(
+    name = "CanvasTOPTool",
+    srcs = glob(["src/*.cpp"]) + glob(["src/*.h"]),
+    copts = ["-I" + package_name() + "/src"],
+    deps = [
+        "@imgui",
+        "@sdl3",
+        "@skia//:core",
+        "@skia//:fontmgr_coretext",
+        "@spdlog",
+        "@touchdesigner//top",
+    ],
+)

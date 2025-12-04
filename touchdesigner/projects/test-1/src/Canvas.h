@@ -2,12 +2,12 @@
 #define CANVAS_H
 
 #include <functional>
-#include <include/core/SkCanvas.h>
-#include <include/core/SkFontMgr.h>
-#include <include/core/SkPixmap.h>
-#include <include/core/SkRefCnt.h>
-#include <include/core/SkSurface.h>
-#include <include/ports/SkFontMgr_mac_ct.h>
+#include "include/core/SkCanvas.h"
+#include "include/core/SkFontMgr.h"
+#include "include/core/SkPixmap.h"
+#include "include/core/SkRefCnt.h"
+#include "include/core/SkSurface.h"
+#include "include/ports/SkFontMgr_mac_ct.h"
 
 class Canvas {
   public:

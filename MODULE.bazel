@@ -1,0 +1,57 @@
+module(
+    name = "grimoire",
+    version = "0.1.0",
+)
+
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+bazel_dep(name = "apple_support", version = "1.24.5", repo_name = "build_bazel_apple_support")
+bazel_dep(name = "rules_cc", version = "0.2.14")
+bazel_dep(name = "rules_foreign_cc", version = "0.15.1")
+bazel_dep(name = "gazelle_cc", version = "0.4.0", dev_dependency = True)
+bazel_dep(name = "bazel_skylib", version = "1.8.2")
+
+# Hedron's Compile Commands Extractor for Bazel
+# https://github.com/hedronvision/bazel-compile-commands-extractor
+bazel_dep(name = "hedron_compile_commands", dev_dependency = True)
+git_override(
+    module_name = "hedron_compile_commands",
+    remote = "https://github.com/hedronvision/bazel-compile-commands-extractor.git",
+    commit = "abb61a688167623088f8768cc9264798df6a9d10",
+    # Replace the commit hash (above) with the latest (https://github.com/hedronvision/bazel-compile-commands-extractor/commits/main).
+    # Even better, set up Renovate and let it do the work for you (see "Suggestion: Updates" in the README).
+)
+
+http_archive(
+    name = "sdl3",
+    url = "https://github.com/libsdl-org/SDL/releases/download/release-3.2.28/SDL3-3.2.28.zip",
+    sha256 = "24a30069af514a6c6b773bdc8ccca8b321661b251381acc1daeebf8c8f4a109a",
+    strip_prefix = "SDL3-3.2.28",
+    build_file = "@//third_party/sdl3:sdl3.BUILD",
+)
+
+http_archive(
+    name = "imgui",
+    url = "https://github.com/ocornut/imgui/archive/refs/tags/v1.92.5.zip",
+    sha256 = "999358dd8e78b65900bd49db57b88ae2105ac8d7018d6a52fb9b9ae67f122592",
+    strip_prefix = "imgui-1.92.5",
+    build_file = "@//third_party/imgui:imgui.BUILD",
+)
+
+bazel_dep(name = "touchdesigner")
+git_override(
+    module_name = "touchdesigner",
+    remote = "https://github.com/ryuuart/touchdesigner-custom-operators.git",
+    commit = "74b6148a9957c9677b545425a80ec42e71d68f89",
+)
+
+bazel_dep(name = "skia")
+git_override(
+    module_name = "skia",
+    remote = "https://skia.googlesource.com/skia.git",
+    commit = "ee20d565acb08dece4a32e3f209cdd41119015ca",
+)
+
+bazel_dep(name = "skia_user_config")
+local_path_override(module_name = "skia_user_config", path = "third_party/skia/config")
+
+bazel_dep(name = "spdlog", version = "1.16.0.bcr.2")

@@ -1,12 +1,12 @@
 #include "Canvas.h"
 #include <cstddef>
-#include <include/core/SkCanvas.h>
-#include <include/core/SkColorType.h>
-#include <include/core/SkFontMgr.h>
-#include <include/core/SkImageInfo.h>
-#include <include/core/SkRefCnt.h>
-#include <include/core/SkSurface.h>
-#include <include/ports/SkFontMgr_mac_ct.h>
+#include "include/core/SkCanvas.h"
+#include "include/core/SkColorType.h"
+#include "include/core/SkFontMgr.h"
+#include "include/core/SkImageInfo.h"
+#include "include/core/SkRefCnt.h"
+#include "include/core/SkSurface.h"
+#include "include/ports/SkFontMgr_mac_ct.h"
 
 Canvas::Canvas(double width, double height) {
     SkImageInfo imageInfo = SkImageInfo::MakeN32Premul(width, height);
