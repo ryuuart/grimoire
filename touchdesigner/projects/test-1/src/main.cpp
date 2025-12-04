@@ -54,7 +54,6 @@ constexpr double TARGET_FPS = 1.0f / 60.0f;
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
     spdlog::info("Initializing SDL App...");
-    spdlog::info(IMGUI_USER_CONFIG);
     SDL_SetAppMetadata("Skia + imgui test proj", "0.1.0", nullptr);
 
     if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD)) {
