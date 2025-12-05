@@ -32,9 +32,6 @@
 #include "include/core/SkPathBuilder.h"
 #include "include/core/SkSurface.h"
 
-// Touchdesigner
-#include "TOP_CPlusPlusBase.h"
-
 struct SdlContext {
     SDL_Window *window;
     SDL_GPUDevice *gpuDevice;
@@ -175,6 +172,7 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
                                    .c_str(),
                                10, (i + 1) * 20, font, p);
         }
+        canvas->translate(cos(sdlContext.totalTime * 0.01) * 10, sin(sdlContext.totalTime * 0.01) * 10);
     });
 
     SkPixmap pixmap = skiaContext.canvas.getPixmap();
