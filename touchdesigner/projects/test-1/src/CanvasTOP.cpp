@@ -1,13 +1,14 @@
 #include "CanvasTOP.h"
+#include "CPlusPlus_Common.h"
 #include "Canvas.h"
+#include "TOP_CPlusPlusBase.h"
 #include "include/core/SkCanvas.h"
+#include "include/core/SkColor.h"
 #include "include/core/SkImage.h"
+#include "include/core/SkMatrix.h"
 #include "include/core/SkPaint.h"
 #include "include/core/SkPathBuilder.h"
 #include "include/core/SkSurface.h"
-#include "CPlusPlus_Common.h"
-#include "TOP_CPlusPlusBase.h"
-#include "include/core/SkMatrix.h"
 #include <optional>
 
 extern "C" {
@@ -41,7 +42,7 @@ TOP_CPlusPlusBase *CreateTOPInstance(const OP_NodeInfo *info,
 }
 
 CanvasTOP::CanvasTOP(const OP_NodeInfo *info, TOP_Context *context)
-    : m_canvas{128, 128}, m_context{context}, m_info{info} {}
+    : m_canvas{1024, 1024}, m_context{context}, m_info{info} {}
 
 CanvasTOP::~CanvasTOP() {}
 
@@ -76,19 +77,22 @@ void CanvasTOP::execute(TOP_Output *output, const OP_Inputs *inputs,
         path.close();
         SkPaint p;
         p.setAntiAlias(true);
-        canvas->clear(SK_ColorBLUE);
+        canvas->clear(SK_ColorTRANSPARENT);
+        auto outputPath = path.detach();
+        auto tmpScale = scaleValue.value_or(0.0f);
         for (int i = 0; i < count; i++) {
-            float xrand = rand() % 10;
-            float yrand = rand() % 10;
-            // path.transform(SkMatrix::Translate(
-            //     SkVector{0.5f * scale * xrand, 0.5f * scale * yrand}));
-            path.transform(
-                SkMatrix::Translate(SkVector{0.5f * scale, 0.5f * scale}));
-            canvas->drawPath(path.detach(), p);
+            // float xrand = rand() % canvas->getSurface()->width();
+            // float yrand = rand() % canvas->getSurface()->height();
+
+            // outputPath.moveTo(canvas->getSurface()->width() /
+            //                       static_cast<double>(i + 1) * 0.8,
+            //                   canvas->getSurface()->height() /
+            //                       static_cast<double>(i + 1) * 0.8);
+            outputPath.transform(SkMatrix::Translate(i * 100, i * 100));
+            outputPath.transform(SkMatrix::Scale(tmpScale, tmpScale));
+            outputPath.transform(SkMatrix::RotateRad(rotation * TAU / 2));
+            canvas->drawPath(outputPath, p);
         }
-        auto tmpScale = scaleValue.value_or(1.0f);
-        canvas->scale(tmpScale, tmpScale);
-        canvas->rotate(rotation);
     });
 
     const SkPixmap &pixmap = m_canvas.getPixmap();
