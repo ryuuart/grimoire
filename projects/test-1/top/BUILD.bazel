@@ -1,0 +1,38 @@
+load("@rules_apple//apple:macos.doc.bzl", "macos_bundle", "macos_dylib")
+load(
+    "@rules_apple//apple:versioning.bzl",
+    "apple_bundle_version",
+)
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "srcs",
+    srcs = [
+        "src/CanvasTOP.cpp",
+        "src/CanvasTOP.h",
+        "src/Parameters.cpp",
+        "src/Parameters.h",
+    ],
+    deps = [
+        "//libraries/canvas",
+        "@touchdesigner//top",
+    ],
+    alwayslink = True,
+)
+
+apple_bundle_version(
+    name = "version",
+    build_version = "0.1",
+)
+
+macos_bundle(
+    name = "top",
+    bundle_extension = "plugin",
+    bundle_id = "dev.long-nguyen.touchdesigner.test-1",
+    infoplists = [":Info.plist"],
+    minimum_os_version = "26.1",
+    version = ":version",
+    deps = [
+        ":srcs",
+    ],
+)

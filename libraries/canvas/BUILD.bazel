@@ -1,0 +1,27 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+filegroup(
+    name = "canvas_srcs",
+    srcs = [
+        "src/Canvas.cpp",
+    ],
+)
+
+filegroup(
+    name = "canvas_hdrs",
+    srcs = [
+        "src/Canvas.h",
+    ],
+)
+
+cc_library(
+    name = "canvas",
+    srcs = [":canvas_srcs"],
+    hdrs = [":canvas_hdrs"],
+    includes = ["src"],
+    deps = [
+        "@skia//:core",
+        "@skia//:fontmgr_coretext",
+    ],
+    visibility = ["//visibility:public"]
+)

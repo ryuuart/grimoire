@@ -421,3 +421,23 @@ healthchecksdb
 MigrationBackup/
 
 # End of https://www.gitignore.io/api/c++,bazel,macos,visualstudio
+
+# caches
+.cache/
+
+# build artifacts
+build/
+
+# vcpkg
+vcpkg_installed/
+
+# imgui
+imgui.ini
+
+# CMake
+CMakeUserPresets.json
+
+# clangd
+compile_commands.json
+
+external/
