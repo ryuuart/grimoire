@@ -12,6 +12,7 @@ cmake(
         "-G Ninja",
     ],
     lib_source = ":all_srcs",
+    includes = ["include"],
     out_shared_libs = ["libSDL3.0.dylib"],
     visibility = ["//visibility:public"],
 )
