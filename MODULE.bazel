@@ -9,10 +9,8 @@ bazel_dep(name = "apple_support", version = "1.24.5", repo_name = "build_bazel_a
 bazel_dep(name = "rules_apple", version = "4.3.2")
 bazel_dep(name = "rules_cc", version = "0.2.14")
 bazel_dep(name = "rules_foreign_cc", version = "0.15.1")
-
 bazel_dep(name = "gazelle", version = "0.47.0", dev_dependency = True)
 bazel_dep(name = "gazelle_cc", version = "0.4.0", dev_dependency = True)
-
 bazel_dep(name = "bazel_skylib", version = "1.8.2")
 
 # Hedron's Compile Commands Extractor for Bazel
