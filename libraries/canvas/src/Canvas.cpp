@@ -1,5 +1,4 @@
 #include "Canvas.h"
-#include <cstddef>
 #include "include/core/SkCanvas.h"
 #include "include/core/SkColorType.h"
 #include "include/core/SkFontMgr.h"
@@ -7,6 +6,7 @@
 #include "include/core/SkRefCnt.h"
 #include "include/core/SkSurface.h"
 #include "include/ports/SkFontMgr_mac_ct.h"
+#include <cstddef>
 
 Canvas::Canvas(double width, double height) {
     SkImageInfo imageInfo = SkImageInfo::MakeN32Premul(width, height);
@@ -15,10 +15,6 @@ Canvas::Canvas(double width, double height) {
 
     SkFontMgr_New_CoreText(nullptr);
     m_fontManager = SkFontMgr_New_CoreText(nullptr);
-}
-
-void Canvas::draw(const std::function<void(SkCanvas *canvas)> &drawFunction) {
-    drawFunction(m_surface->getCanvas());
 }
 
 void Canvas::updateSize(int width, int height) {

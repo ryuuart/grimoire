@@ -5,6 +5,9 @@ cc_binary(
     srcs = [
         "src/SdlDrawable.cpp",
         "src/SdlDrawable.h",
+        "src/Context.h",
+        "src/draw.h",
+        "src/draw.cpp",
         "src/imconfig_overlay.h",
         "src/main.cpp",
     ],

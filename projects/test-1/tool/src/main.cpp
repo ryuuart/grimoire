@@ -1,16 +1,14 @@
 #include "Canvas.h"
-#include "SdlDrawable.h"
 #include "SDL3/SDL_gpu.h"
-#include "SDL3/SDL_stdinc.h"
-#include <cstring>
-#include "include/core/SkColor.h"
-#include "include/core/SkFontMgr.h"
-#include "include/core/SkMatrix.h"
+#include "SdlDrawable.h"
+#include "draw.h"
 #include "include/core/SkPixmap.h"
-#include "include/private/base/SkPoint_impl.h"
-#include <string>
+#include <cstring>
+#include <functional>
+#include <optional>
+#include <utility>
 #define SDL_MAIN_USE_CALLBACKS
-#include "SDL3/SDL.h"
+#include "Context.h"
 #include "SDL3/SDL_error.h"
 #include "SDL3/SDL_events.h"
 #include "SDL3/SDL_init.h"
@@ -25,27 +23,8 @@
 
 // Skia
 #include "include/core/SkCanvas.h"
-#include "include/core/SkFont.h"
-#include "include/core/SkFontStyle.h"
 #include "include/core/SkImage.h"
-#include "include/core/SkPaint.h"
-#include "include/core/SkPathBuilder.h"
 #include "include/core/SkSurface.h"
-
-struct SdlContext {
-    SDL_Window *window;
-    SDL_GPUDevice *gpuDevice;
-    Uint64 totalTime;
-};
-
-struct SkiaContext {
-    Canvas canvas{0.0, 0.0};
-};
-
-struct AppContext {
-    SdlContext sdlContext;
-    SkiaContext skiaContext;
-};
 
 constexpr double TARGET_FPS = 1.0f / 60.0f;
 
@@ -138,42 +117,7 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
 
     sdlContext.totalTime += 20;
 
-    skiaContext.canvas.draw([&sdlContext, &skiaContext](SkCanvas *canvas) {
-        const SkScalar scale = 256.0f;
-        const SkScalar R = 0.45f * scale;
-        const SkScalar TAU = 6.2831853f;
-        SkPathBuilder path;
-        path.moveTo(R, 0.0f);
-        for (int i = 1; i < 7; ++i) {
-            SkScalar theta = 3 * i * TAU / 7;
-            path.lineTo(R * cos(theta), R * sin(theta));
-        }
-        path.close();
-        SkPaint p;
-        p.setAntiAlias(true);
-        canvas->clear(SK_ColorBLUE);
-        path.transform(SkMatrix::RotateDeg(sdlContext.totalTime * 0.01));
-        path.transform(
-            SkMatrix::Translate(SkVector{0.5f * scale, 0.5f * scale}));
-        auto finalPath = path.detach();
-        for (int i = 0; i < 5; i++) {
-            canvas->drawPath(finalPath, p);
-            finalPath.transform(SkMatrix::Translate(i * 100, i * 100));
-        }
-        canvas->drawPath(path.detach(), p);
-
-        sk_sp<SkTypeface> typeface =
-            skiaContext.canvas.getFontManager()->matchFamilyStyle(
-                "Akzidenz-Grotesk Next", SkFontStyle());
-        SkFont font{typeface, 32};
-        for (int i = 0; i < 10; i++) {
-            canvas->drawString((std::string{"Testerino! "} +
-                                std::to_string(sdlContext.totalTime * 0.5 * i))
-                                   .c_str(),
-                               10, (i + 1) * 20, font, p);
-        }
-        canvas->translate(cos(sdlContext.totalTime * 0.01) * 10, sin(sdlContext.totalTime * 0.01) * 10);
-    });
+    skiaContext.canvas.draw(draw, CanvasContext{sdlContext, skiaContext});
 
     SkPixmap pixmap = skiaContext.canvas.getPixmap();
     SdlDrawable::SdlDrawableDescriptor drawableDescriptor{
