@@ -7,7 +7,7 @@
 #include "include/core/SkPaint.h"
 #include "include/core/SkPathBuilder.h"
 
-void draw(SkCanvas *canvas, CanvasContext &context) {
+void draw(SkCanvas *canvas, ToolContext &context) {
     const SkScalar scale = 256.0f;
     const SkScalar R = 0.45f * scale;
     const SkScalar TAU = 6.2831853f;
@@ -21,7 +21,7 @@ void draw(SkCanvas *canvas, CanvasContext &context) {
     SkPaint p;
     p.setAntiAlias(true);
     canvas->clear(SK_ColorBLUE);
-    path.transform(SkMatrix::RotateDeg(context.sdlContext.totalTime * 0.01));
+    path.transform(SkMatrix::RotateDeg(context.totalTime * 0.01));
     path.transform(SkMatrix::Translate(SkVector{0.5f * scale, 0.5f * scale}));
     auto finalPath = path.detach();
     for (int i = 0; i < 5; i++) {
@@ -31,16 +31,15 @@ void draw(SkCanvas *canvas, CanvasContext &context) {
     canvas->drawPath(path.detach(), p);
 
     sk_sp<SkTypeface> typeface =
-        context.skiaContext.canvas.getFontManager()->matchFamilyStyle(
+        context.canvas.getFontManager()->matchFamilyStyle(
             "Akzidenz-Grotesk Next", SkFontStyle());
     SkFont font{typeface, 32};
     for (int i = 0; i < 10; i++) {
-        canvas->drawString(
-            (std::string{"Testerino! "} +
-             std::to_string(context.sdlContext.totalTime * 0.5 * i))
-                .c_str(),
-            10, (i + 1) * 20, font, p);
+        canvas->drawString((std::string{"Testerino! "} +
+                            std::to_string(context.totalTime * 0.5 * i))
+                               .c_str(),
+                           10, (i + 1) * 20, font, p);
     }
-    canvas->translate(cos(context.sdlContext.totalTime * 0.01) * 10,
-                      sin(context.sdlContext.totalTime * 0.01) * 10);
+    canvas->translate(cos(context.totalTime * 0.01) * 10,
+                      sin(context.totalTime * 0.01) * 10);
 }

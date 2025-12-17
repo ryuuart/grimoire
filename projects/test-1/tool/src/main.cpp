@@ -4,8 +4,6 @@
 #include "draw.h"
 #include "include/core/SkPixmap.h"
 #include <cstring>
-#include <functional>
-#include <optional>
 #include <utility>
 #define SDL_MAIN_USE_CALLBACKS
 #include "Context.h"
@@ -24,9 +22,11 @@
 // Skia
 #include "include/core/SkCanvas.h"
 #include "include/core/SkImage.h"
-#include "include/core/SkSurface.h"
 
-constexpr double TARGET_FPS = 1.0f / 60.0f;
+struct AppContext {
+    SdlContext sdlContext;
+    ToolContext toolContext;
+};
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
     spdlog::info("Initializing SDL App...");
@@ -95,14 +95,14 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
     ImGui_ImplSDLGPU3_Init(&init_info);
 
     float pixelDensity = SDL_GetWindowPixelDensity(window);
-    SkiaContext skiaContext{.canvas =
-                                Canvas{window_size.first * pixelDensity,
-                                       window_size.second * pixelDensity}};
+    SdlContext sdlContext{.window = window, .gpuDevice = gpu_device};
+    ToolContext toolContext{.canvas = Canvas{window_size.first * pixelDensity,
+                                             window_size.second * pixelDensity},
+                            "",
+                            0};
 
-    *appstate = new AppContext{
-        .sdlContext = SdlContext{.window = window, .gpuDevice = gpu_device},
-        .skiaContext = skiaContext,
-    };
+    *appstate = new AppContext{.sdlContext = std::move(sdlContext),
+                               .toolContext = std::move(toolContext)};
 
     return SDL_APP_CONTINUE;
 }
@@ -110,16 +110,16 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
 SDL_AppResult SDL_AppIterate(void *appstate) {
     AppContext *appContext = static_cast<AppContext *>(appstate);
     SdlContext &sdlContext = appContext->sdlContext;
-    SkiaContext &skiaContext = appContext->skiaContext;
+    ToolContext &toolContext = appContext->toolContext;
     SDL_Window *window = sdlContext.window;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
     bool show_demo_window = true;
 
-    sdlContext.totalTime += 20;
+    toolContext.totalTime += 20;
 
-    skiaContext.canvas.draw(draw, CanvasContext{sdlContext, skiaContext});
+    toolContext.canvas.draw(draw, toolContext);
 
-    SkPixmap pixmap = skiaContext.canvas.getPixmap();
+    SkPixmap pixmap = toolContext.canvas.getPixmap();
     SdlDrawable::SdlDrawableDescriptor drawableDescriptor{
         .buffer = pixmap.addr(),
         .sizeInBytes = pixmap.computeByteSize(),
@@ -182,7 +182,7 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
 SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
     AppContext *appContext = static_cast<AppContext *>(appstate);
     SdlContext &sdlContext = appContext->sdlContext;
-    SkiaContext &skiaContext = appContext->skiaContext;
+    ToolContext &toolContext = appContext->toolContext;
     SDL_Window *window = sdlContext.window;
 
     switch (event->type) {
@@ -191,7 +191,7 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
         int width, height;
         width = event->window.data1;
         height = event->window.data2;
-        skiaContext.canvas.updateSize(width * pixelDensity,
+        toolContext.canvas.updateSize(width * pixelDensity,
                                       height * pixelDensity);
         break;
     }

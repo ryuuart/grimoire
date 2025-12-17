@@ -2,15 +2,7 @@ load("@rules_cc//cc:defs.bzl", "cc_binary")
 
 cc_binary(
     name = "tool",
-    srcs = [
-        "src/SdlDrawable.cpp",
-        "src/SdlDrawable.h",
-        "src/Context.h",
-        "src/draw.h",
-        "src/draw.cpp",
-        "src/imconfig_overlay.h",
-        "src/main.cpp",
-    ],
+    srcs = glob(["src/*.cpp", "src/*.h"]),
     copts = ["-I" + package_name() + "/src"],
     deps = [
         "//libraries/canvas",

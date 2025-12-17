@@ -7,9 +7,6 @@
 #include "include/core/SkRefCnt.h"
 #include "include/core/SkSurface.h"
 #include "include/ports/SkFontMgr_mac_ct.h"
-#include <functional>
-#include <optional>
-#include <utility>
 
 class Canvas {
   public:
@@ -29,8 +26,6 @@ class Canvas {
     sk_sp<SkSurface> m_surface;
     sk_sp<SkFontMgr> m_fontManager;
     SkPixmap m_pixmap;
-
-    void draw_impl() {}
 };
 
 #endif
