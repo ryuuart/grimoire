@@ -1,4 +1,4 @@
-#include "draw.h"
+#include "ToolCanvas.h"
 #include "include/core/SkColor.h"
 #include "include/core/SkFont.h"
 #include "include/core/SkFontMgr.h"
@@ -6,8 +6,12 @@
 #include "include/core/SkMatrix.h"
 #include "include/core/SkPaint.h"
 #include "include/core/SkPathBuilder.h"
+#include <Canvas.h>
 
-void draw(SkCanvas *canvas, ToolContext &context) {
+ToolCanvas::ToolCanvas(double width, double height, ToolContext &context)
+    : Canvas{width, height}, m_context{context} {}
+
+void ToolCanvas::draw() {
     const SkScalar scale = 256.0f;
     const SkScalar R = 0.45f * scale;
     const SkScalar TAU = 6.2831853f;
@@ -20,26 +24,25 @@ void draw(SkCanvas *canvas, ToolContext &context) {
     path.close();
     SkPaint p;
     p.setAntiAlias(true);
-    canvas->clear(SK_ColorBLUE);
-    path.transform(SkMatrix::RotateDeg(context.totalTime * 0.01));
+    m_canvas->clear(SK_ColorBLUE);
+    path.transform(SkMatrix::RotateDeg(m_context.totalTime * 0.01));
     path.transform(SkMatrix::Translate(SkVector{0.5f * scale, 0.5f * scale}));
     auto finalPath = path.detach();
     for (int i = 0; i < 5; i++) {
-        canvas->drawPath(finalPath, p);
+        m_canvas->drawPath(finalPath, p);
         finalPath.transform(SkMatrix::Translate(i * 100, i * 100));
     }
-    canvas->drawPath(path.detach(), p);
+    m_canvas->drawPath(path.detach(), p);
 
     sk_sp<SkTypeface> typeface =
-        context.canvas.getFontManager()->matchFamilyStyle(
-            "Akzidenz-Grotesk Next", SkFontStyle());
+        m_fontManager->matchFamilyStyle("Akzidenz-Grotesk Next", SkFontStyle());
     SkFont font{typeface, 32};
     for (int i = 0; i < 10; i++) {
-        canvas->drawString((std::string{"Testerino! "} +
-                            std::to_string(context.totalTime * 0.5 * i))
-                               .c_str(),
-                           10, (i + 1) * 20, font, p);
+        m_canvas->drawString((std::string{"Testerino! "} +
+                              std::to_string(m_context.totalTime * 0.5 * i))
+                                 .c_str(),
+                             10, (i + 1) * 20, font, p);
     }
-    canvas->translate(cos(context.totalTime * 0.01) * 10,
-                      sin(context.totalTime * 0.01) * 10);
+    m_canvas->translate(cos(m_context.totalTime * 0.01) * 10,
+                        sin(m_context.totalTime * 0.01) * 10);
 }

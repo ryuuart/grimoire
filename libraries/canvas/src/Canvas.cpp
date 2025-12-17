@@ -13,6 +13,8 @@ Canvas::Canvas(double width, double height) {
     imageInfo = imageInfo.makeColorType(SkColorType::kBGRA_8888_SkColorType);
     m_surface = SkSurfaces::Raster(imageInfo);
 
+    m_canvas = m_surface->getCanvas();
+
     SkFontMgr_New_CoreText(nullptr);
     m_fontManager = SkFontMgr_New_CoreText(nullptr);
 }

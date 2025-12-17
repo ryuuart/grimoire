@@ -6,10 +6,10 @@
   {
     "label": "Debug native binary",
     "build": {
-      "command": "cmake --build --preset main build",
+      "command": "bazel build //projects/test-1/tool",
       "cwd": "$ZED_WORKTREE_ROOT"
     },
-    "program": "$ZED_WORKTREE_ROOT/build/bin/Debug/CanvasTOPTool",
+    "program": "$ZED_WORKTREE_ROOT/bazel-bin/projects/test-1/tool/tool",
     "request": "launch",
     "adapter": "CodeLLDB"
   }

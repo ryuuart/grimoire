@@ -12,19 +12,18 @@ class Canvas {
   public:
     Canvas(double width, double height);
 
-    template <typename F, typename C>
-        requires std::invocable<F &, SkCanvas *, C &>
-    void draw(F &&drawFunction, C &&context) {
-        drawFunction(m_surface->getCanvas(), context);
-    }
+    virtual void draw() = 0;
 
     void updateSize(int width, int height);
     const SkPixmap &getPixmap();
     const sk_sp<SkFontMgr> getFontManager();
 
+  protected:
+    sk_sp<SkFontMgr> m_fontManager;
+    SkCanvas *m_canvas;
+
   private:
     sk_sp<SkSurface> m_surface;
-    sk_sp<SkFontMgr> m_fontManager;
     SkPixmap m_pixmap;
 };
 

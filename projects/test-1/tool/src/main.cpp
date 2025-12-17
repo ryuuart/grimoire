@@ -1,31 +1,30 @@
+#include "config.h"
+
 #include "Canvas.h"
-#include "SDL3/SDL_gpu.h"
-#include "SdlDrawable.h"
-#include "draw.h"
-#include "include/core/SkPixmap.h"
-#include <cstring>
-#include <utility>
-#define SDL_MAIN_USE_CALLBACKS
 #include "Context.h"
 #include "SDL3/SDL_error.h"
 #include "SDL3/SDL_events.h"
+#include "SDL3/SDL_gpu.h"
 #include "SDL3/SDL_init.h"
 #include "SDL3/SDL_main.h"
 #include "SDL3/SDL_video.h"
-
-#define IMGUI_USER_CONFIG "imconfig_overlay.h"
+#include "SdlDrawable.h"
+#include "ToolCanvas.h"
 #include "imgui.h"
 #include "imgui_impl_sdl3.h"
 #include "imgui_impl_sdlgpu3.h"
-#include "spdlog/spdlog.h"
-
-// Skia
 #include "include/core/SkCanvas.h"
 #include "include/core/SkImage.h"
+#include "include/core/SkPixmap.h"
+#include "spdlog/spdlog.h"
+#include <cstring>
+#include <memory>
+#include <utility>
 
 struct AppContext {
-    SdlContext sdlContext;
     ToolContext toolContext;
+    SdlContext sdlContext;
+    std::unique_ptr<Canvas> canvas;
 };
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
@@ -71,7 +70,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
                                   SDL_GPU_SWAPCHAINCOMPOSITION_SDR,
                                   SDL_GPU_PRESENTMODE_VSYNC);
 
-    // Setup Dear ImGui context
+    // // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO &io = ImGui::GetIO();
@@ -96,13 +95,15 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
 
     float pixelDensity = SDL_GetWindowPixelDensity(window);
     SdlContext sdlContext{.window = window, .gpuDevice = gpu_device};
-    ToolContext toolContext{.canvas = Canvas{window_size.first * pixelDensity,
-                                             window_size.second * pixelDensity},
-                            "",
-                            0};
+    ToolContext toolContext{"", 0};
 
-    *appstate = new AppContext{.sdlContext = std::move(sdlContext),
-                               .toolContext = std::move(toolContext)};
+    AppContext *appContext =
+        new AppContext{.toolContext = std::move(toolContext),
+                       .sdlContext = std::move(sdlContext)};
+    appContext->canvas = std::make_unique<ToolCanvas>(
+        window_size.first * pixelDensity, window_size.second * pixelDensity,
+        appContext->toolContext);
+    *appstate = appContext;
 
     return SDL_APP_CONTINUE;
 }
@@ -117,9 +118,9 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
 
     toolContext.totalTime += 20;
 
-    toolContext.canvas.draw(draw, toolContext);
+    appContext->canvas->draw();
 
-    SkPixmap pixmap = toolContext.canvas.getPixmap();
+    SkPixmap pixmap = appContext->canvas->getPixmap();
     SdlDrawable::SdlDrawableDescriptor drawableDescriptor{
         .buffer = pixmap.addr(),
         .sizeInBytes = pixmap.computeByteSize(),
@@ -182,7 +183,6 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
 SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
     AppContext *appContext = static_cast<AppContext *>(appstate);
     SdlContext &sdlContext = appContext->sdlContext;
-    ToolContext &toolContext = appContext->toolContext;
     SDL_Window *window = sdlContext.window;
 
     switch (event->type) {
@@ -191,8 +191,8 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
         int width, height;
         width = event->window.data1;
         height = event->window.data2;
-        toolContext.canvas.updateSize(width * pixelDensity,
-                                      height * pixelDensity);
+        appContext->canvas->updateSize(width * pixelDensity,
+                                       height * pixelDensity);
         break;
     }
     case SDL_EVENT_QUIT:
