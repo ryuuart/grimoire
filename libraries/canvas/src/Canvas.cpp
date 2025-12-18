@@ -22,6 +22,7 @@ Canvas::Canvas(double width, double height) {
 void Canvas::updateSize(int width, int height) {
     if (m_surface->width() != width || m_surface->height() != height) {
         m_surface = m_surface->makeSurface(width, height);
+        m_canvas = m_surface->getCanvas();
     }
 }
 
