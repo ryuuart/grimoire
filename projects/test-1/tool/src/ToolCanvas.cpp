@@ -1,4 +1,5 @@
 #include "ToolCanvas.h"
+#include "Canvas.h"
 #include "include/core/SkColor.h"
 #include "include/core/SkFont.h"
 #include "include/core/SkFontMgr.h"
@@ -6,7 +7,6 @@
 #include "include/core/SkMatrix.h"
 #include "include/core/SkPaint.h"
 #include "include/core/SkPathBuilder.h"
-#include <Canvas.h>
 
 ToolCanvas::ToolCanvas(double width, double height, ToolContext &context)
     : Canvas{width, height}, m_context{context} {}
@@ -38,11 +38,9 @@ void ToolCanvas::draw() {
         m_fontManager->matchFamilyStyle("Akzidenz-Grotesk Next", SkFontStyle());
     SkFont font{typeface, 32};
     for (int i = 0; i < 10; i++) {
-        m_canvas->drawString((std::string{"Testerino! "} +
-                              std::to_string(m_context.totalTime * 0.5 * i))
-                                 .c_str(),
-                             10, (i + 1) * 20, font, p);
+        m_canvas->drawString(
+            std::to_string(m_context.totalTime * 0.5 * i).c_str(), 10,
+            (i + 1) * 20, font, p);
     }
-    m_canvas->translate(cos(m_context.totalTime * 0.01) * 10,
-                        sin(m_context.totalTime * 0.01) * 10);
+    m_canvas->drawString(m_context.content.c_str(), 20, 300, font, p);
 }

@@ -24,13 +24,13 @@ filegroup(
     name = "base_srcs",
     srcs = glob([
         "*.cpp",
-    ]) + ["misc/cpp/imgui_stdlib.*"],
+    ]) + ["misc/cpp/imgui_stdlib.cpp"],
     visibility = ["//visibility:public"],
 )
 
 filegroup(
     name = "base_hdrs",
-    srcs = glob(["*.h"]),
+    srcs = glob(["*.h"]) + ["misc/cpp/imgui_stdlib.h"],
     visibility = ["//visibility:public"],
 )
 
@@ -108,6 +108,7 @@ cc_library(
     includes = [
         ".",
         "backends",
+        "misc/cpp"
     ],
     visibility = ["//visibility:public"],
     deps = [

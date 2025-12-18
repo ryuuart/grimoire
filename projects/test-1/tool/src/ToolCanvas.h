@@ -3,7 +3,7 @@
 #include "Canvas.h"
 
 struct ToolContext {
-    char paragraph[1024 * 5];
+    std::string content;
     uint64_t totalTime;
 };
 

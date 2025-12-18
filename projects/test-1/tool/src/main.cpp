@@ -1,7 +1,8 @@
-#include "config.h"
+#include "Config.h"
 
 #include "Canvas.h"
 #include "Context.h"
+#include "Gui.h"
 #include "SDL3/SDL_error.h"
 #include "SDL3/SDL_events.h"
 #include "SDL3/SDL_gpu.h"
@@ -25,6 +26,7 @@ struct AppContext {
     ToolContext toolContext;
     SdlContext sdlContext;
     std::unique_ptr<Canvas> canvas;
+    std::unique_ptr<Gui> gui;
 };
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
@@ -103,6 +105,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
     appContext->canvas = std::make_unique<ToolCanvas>(
         window_size.first * pixelDensity, window_size.second * pixelDensity,
         appContext->toolContext);
+    appContext->gui = std::make_unique<Gui>(appContext->toolContext);
     *appstate = appContext;
 
     return SDL_APP_CONTINUE;
@@ -114,7 +117,6 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
     ToolContext &toolContext = appContext->toolContext;
     SDL_Window *window = sdlContext.window;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-    bool show_demo_window = true;
 
     toolContext.totalTime += 20;
 
@@ -134,8 +136,7 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
     ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
 
-    if (show_demo_window)
-        ImGui::ShowDemoWindow(&show_demo_window);
+    appContext->gui->draw();
 
     // Rendering
     ImGui::Render();
