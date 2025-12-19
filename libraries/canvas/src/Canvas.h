@@ -12,6 +12,7 @@ class Canvas {
   public:
     Canvas(double width, double height);
 
+    virtual void prepare() = 0;
     virtual void draw() = 0;
 
     void updateSize(int width, int height);

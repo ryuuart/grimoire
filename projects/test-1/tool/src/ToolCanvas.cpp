@@ -7,9 +7,24 @@
 #include "include/core/SkMatrix.h"
 #include "include/core/SkPaint.h"
 #include "include/core/SkPathBuilder.h"
+#include "modules/skunicode/include/SkUnicode_icu.h"
+
+using namespace skia::textlayout;
 
 ToolCanvas::ToolCanvas(double width, double height, ToolContext &context)
-    : Canvas{width, height}, m_context{context} {}
+    : Canvas{width, height}, m_context{context},
+      m_font_collection{sk_make_sp<FontCollection>()},
+      m_unicode{SkUnicodes::ICU::Make()} {
+    m_font_collection->setAssetFontManager(m_fontManager);
+    m_paragraph_builder =
+        ParagraphBuilder::make(m_paragraph_style, m_font_collection, m_unicode);
+}
+
+void ToolCanvas::prepare() {
+    m_paragraph_builder->Reset();
+    m_paragraph_builder->addText(m_context.content.c_str());
+    m_paragraph_builder->pop();
+}
 
 void ToolCanvas::draw() {
     const SkScalar scale = 256.0f;
@@ -43,4 +58,9 @@ void ToolCanvas::draw() {
             (i + 1) * 20, font, p);
     }
     m_canvas->drawString(m_context.content.c_str(), 20, 300, font, p);
+
+    // paragraph logic
+    std::unique_ptr<Paragraph> paragraph = m_paragraph_builder->Build();
+    paragraph->layout(300);
+    paragraph->paint(m_canvas, 20, 400);
 }

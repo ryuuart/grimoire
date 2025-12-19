@@ -22,6 +22,8 @@ cc_library(
     deps = [
         "@skia//:core",
         "@skia//:fontmgr_coretext",
+        "@skia//:skparagraph_harfbuzz_skunicode",
+        "@skia//:skunicode_icu"
     ],
     visibility = ["//visibility:public"]
 )

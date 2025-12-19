@@ -120,6 +120,14 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
 
     toolContext.totalTime += 20;
 
+    // Start the Dear ImGui frame
+    ImGui_ImplSDLGPU3_NewFrame();
+    ImGui_ImplSDL3_NewFrame();
+    ImGui::NewFrame();
+
+    appContext->gui->draw();
+
+    appContext->canvas->prepare();
     appContext->canvas->draw();
 
     SkPixmap pixmap = appContext->canvas->getPixmap();
@@ -130,13 +138,6 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
         .height = static_cast<uint32_t>(pixmap.height()),
     };
     SdlDrawable skiaDrawable(sdlContext.gpuDevice, drawableDescriptor);
-
-    // Start the Dear ImGui frame
-    ImGui_ImplSDLGPU3_NewFrame();
-    ImGui_ImplSDL3_NewFrame();
-    ImGui::NewFrame();
-
-    appContext->gui->draw();
 
     // Rendering
     ImGui::Render();
