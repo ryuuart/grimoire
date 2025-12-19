@@ -20,11 +20,7 @@ ToolCanvas::ToolCanvas(double width, double height, ToolContext &context)
         ParagraphBuilder::make(m_paragraph_style, m_font_collection, m_unicode);
 }
 
-void ToolCanvas::prepare() {
-    m_paragraph_builder->Reset();
-    m_paragraph_builder->addText(m_context.content.c_str());
-    m_paragraph_builder->pop();
-}
+void ToolCanvas::prepare() { m_paragraph_builder->Reset(); }
 
 void ToolCanvas::draw() {
     const SkScalar scale = 256.0f;
@@ -57,10 +53,22 @@ void ToolCanvas::draw() {
             std::to_string(m_context.totalTime * 0.5 * i).c_str(), 10,
             (i + 1) * 20, font, p);
     }
-    m_canvas->drawString(m_context.content.c_str(), 20, 300, font, p);
 
     // paragraph logic
+    TextStyle textStyle;
+    textStyle.setForegroundPaint(p);
+    textStyle.setBackgroundPaint(SkPaint{SkColor4f{1, 1, 1, 1}});
+    m_paragraph_builder->pushStyle(textStyle);
+    m_paragraph_builder->addText(m_context.content.c_str());
     std::unique_ptr<Paragraph> paragraph = m_paragraph_builder->Build();
+
     paragraph->layout(300);
-    paragraph->paint(m_canvas, 20, 400);
+    m_canvas->drawRect(SkRect::MakeXYWH(10, 340,
+                                        paragraph->getLongestLine() + 20,
+                                        paragraph->getHeight() + 20),
+                       p);
+    paragraph->paint(m_canvas, 20, 350);
+
+    // independent string logic
+    m_canvas->drawString(m_context.content.c_str(), 20, 300, font, p);
 }
