@@ -1,5 +1,6 @@
 #include "ToolCanvas.h"
 #include "Canvas.h"
+#include "choreograph/Choreograph.h"
 #include "include/core/SkColor.h"
 #include "include/core/SkFont.h"
 #include "include/core/SkFontMgr.h"
@@ -8,6 +9,8 @@
 #include "include/core/SkPaint.h"
 #include "include/core/SkPathBuilder.h"
 #include "modules/skunicode/include/SkUnicode_icu.h"
+#include <arm/_mcontext.h>
+#include <cstdint>
 
 using namespace skia::textlayout;
 
@@ -39,36 +42,33 @@ void ToolCanvas::draw() {
     path.transform(SkMatrix::RotateDeg(m_context.totalTime * 0.01));
     path.transform(SkMatrix::Translate(SkVector{0.5f * scale, 0.5f * scale}));
     auto finalPath = path.detach();
-    for (int i = 0; i < 5; i++) {
-        m_canvas->drawPath(finalPath, p);
-        finalPath.transform(SkMatrix::Translate(i * 100, i * 100));
-    }
     m_canvas->drawPath(path.detach(), p);
 
     sk_sp<SkTypeface> typeface =
         m_fontManager->matchFamilyStyle("Akzidenz-Grotesk Next", SkFontStyle());
     SkFont font{typeface, 32};
-    for (int i = 0; i < 10; i++) {
-        m_canvas->drawString(
-            std::to_string(m_context.totalTime * 0.5 * i).c_str(), 10,
-            (i + 1) * 20, font, p);
-    }
 
     // paragraph logic
     TextStyle textStyle;
+    textStyle.setFontSize(m_context.fontSize);
     textStyle.setForegroundPaint(p);
     textStyle.setBackgroundPaint(SkPaint{SkColor4f{1, 1, 1, 1}});
     m_paragraph_builder->pushStyle(textStyle);
     m_paragraph_builder->addText(m_context.content.c_str());
     std::unique_ptr<Paragraph> paragraph = m_paragraph_builder->Build();
+    paragraph->layout(m_context.contentWidth);
 
-    paragraph->layout(300);
-    m_canvas->drawRect(SkRect::MakeXYWH(10, 340,
-                                        paragraph->getLongestLine() + 20,
-                                        paragraph->getHeight() + 20),
-                       p);
-    paragraph->paint(m_canvas, 20, 350);
+    // draw paragraphs
+    for (uint8_t i = 0; i < m_context.clones[0]; i++) {
+        for (uint8_t j = 0; j < m_context.clones[1]; j++) {
+            paragraph->paint(m_canvas, i * paragraph->getLongestLine(),
+                             j * paragraph->getHeight());
+        }
+    }
 
-    // independent string logic
-    m_canvas->drawString(m_context.content.c_str(), 20, 300, font, p);
+    // draw stars
+    for (uint8_t i = 0; i < m_context.clones[1]; i++) {
+        m_canvas->drawPath(finalPath, p);
+        finalPath.transform(SkMatrix::Translate(i * 100, i * 100));
+    }
 }

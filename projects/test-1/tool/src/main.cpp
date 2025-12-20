@@ -97,7 +97,11 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
 
     float pixelDensity = SDL_GetWindowPixelDensity(window);
     SdlContext sdlContext{.window = window, .gpuDevice = gpu_device};
-    ToolContext toolContext{"", 0};
+    ToolContext toolContext{.content = "Test Content",
+                            .totalTime = 0,
+                            .clones{1, 1},
+                            .fontSize = 32,
+                            .contentWidth = 300};
 
     AppContext *appContext =
         new AppContext{.toolContext = std::move(toolContext),

@@ -2,10 +2,15 @@
 #define TOOL_CANVAS_H
 #include "Canvas.h"
 #include "modules/skparagraph/include/ParagraphBuilder.h"
+#include <cstdint>
 
 struct ToolContext {
     std::string content;
     uint64_t totalTime;
+    int32_t translation;
+    uint16_t clones[2];
+    uint16_t fontSize;
+    uint32_t contentWidth;
 };
 
 class ToolCanvas : public Canvas {

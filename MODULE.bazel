@@ -40,6 +40,14 @@ http_archive(
     url = "https://github.com/ocornut/imgui/archive/refs/tags/v1.92.5.zip",
 )
 
+http_archive(
+    name = "choreograph",
+    build_file = "@//third_party/choreograph:choreograph.BUILD",
+    url = "https://github.com/sansumbrella/Choreograph/archive/34631980702f5d3745ac29d262712dd81b594ade.zip",
+    sha256 = "57d2a2b29813b4d96402d29579d03b6b9ccbea49b8bbed80bbdcd425bafb8d31",
+    strip_prefix = "Choreograph-34631980702f5d3745ac29d262712dd81b594ade"
+)
+
 bazel_dep(name = "touchdesigner")
 git_override(
     module_name = "touchdesigner",
