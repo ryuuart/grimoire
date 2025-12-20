@@ -8,6 +8,7 @@
 #include "SDL3/SDL_gpu.h"
 #include "SDL3/SDL_init.h"
 #include "SDL3/SDL_main.h"
+#include "SDL3/SDL_timer.h"
 #include "SDL3/SDL_video.h"
 #include "SdlDrawable.h"
 #include "ToolCanvas.h"
@@ -99,9 +100,11 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
     SdlContext sdlContext{.window = window, .gpuDevice = gpu_device};
     ToolContext toolContext{.content = "Test Content",
                             .totalTime = 0,
-                            .clones{1, 1},
+                            .clones_xy{1, 1},
+                            .offset_xy{0, 0},
                             .fontSize = 32,
-                            .contentWidth = 300};
+                            .contentWidth = 300,
+                            .duration = 10};
 
     AppContext *appContext =
         new AppContext{.toolContext = std::move(toolContext),
@@ -122,7 +125,7 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
     SDL_Window *window = sdlContext.window;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-    toolContext.totalTime += 20;
+    toolContext.totalTime = SDL_GetTicks();
 
     // Start the Dear ImGui frame
     ImGui_ImplSDLGPU3_NewFrame();

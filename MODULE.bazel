@@ -69,3 +69,5 @@ local_path_override(
 )
 
 bazel_dep(name = "spdlog", version = "1.16.0.bcr.2")
+
+bazel_dep(name = "glm", version = "1.0.2")

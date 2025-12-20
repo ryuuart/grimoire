@@ -9,6 +9,7 @@ cc_binary(
         "@imgui",
         "@sdl3",
         "@spdlog",
-        "@choreograph"
+        "@choreograph",
+        "@glm"
     ],
 )
