@@ -18,14 +18,18 @@
 #include "include/core/SkCanvas.h"
 #include "include/core/SkImage.h"
 #include "include/core/SkPixmap.h"
+#include "rules_cc/cc/runfiles/runfiles.h"
 #include "spdlog/spdlog.h"
 #include <cstring>
 #include <memory>
 #include <utility>
 
+using rules_cc::cc::runfiles::Runfiles;
+
 struct AppContext {
     ToolContext toolContext;
     SdlContext sdlContext;
+    std::unique_ptr<Runfiles> runfiles;
     std::unique_ptr<Canvas> canvas;
     std::unique_ptr<Gui> gui;
 };
@@ -33,6 +37,13 @@ struct AppContext {
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
     spdlog::info("Initializing SDL App...");
     SDL_SetAppMetadata("Skia + imgui test proj", "0.1.0", nullptr);
+
+    std::string error;
+    std::unique_ptr<Runfiles> runfiles(
+        Runfiles::Create(argv[0], BAZEL_CURRENT_REPOSITORY, &error));
+    if (runfiles == nullptr) {
+        spdlog::error("Could not find Bazel runfiles");
+    }
 
     if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD)) {
         spdlog::info("Couldn't initialized SDL: %s", SDL_GetError());
@@ -82,6 +93,9 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
         ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
     io.ConfigFlags |=
         ImGuiConfigFlags_NavEnableGamepad; // Enable Gamepad Controls
+
+    io.Fonts->AddFontFromFileTTF(
+        runfiles->Rlocation("imgui/misc/fonts/DroidSans.ttf").c_str());
 
     ImGui::StyleColorsDark();
 

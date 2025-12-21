@@ -105,6 +105,7 @@ cc_library(
                ":metal": ["@imgui//:metal_hdrs"],
                "//conditions:default": [],
            }),
+    data = glob(["misc/fonts/*.ttf"]),
     includes = [
         ".",
         "backends",

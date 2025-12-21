@@ -10,6 +10,7 @@ cc_binary(
         "@sdl3",
         "@spdlog",
         "@choreograph",
-        "@glm"
+        "@glm",
+        "@rules_cc//cc/runfiles"
     ],
 )
