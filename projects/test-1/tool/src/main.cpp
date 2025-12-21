@@ -208,6 +208,7 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
     SdlContext &sdlContext = appContext->sdlContext;
     SDL_Window *window = sdlContext.window;
 
+    ImGui_ImplSDL3_ProcessEvent(event);
     switch (event->type) {
     case SDL_EVENT_WINDOW_RESIZED: {
         float pixelDensity = SDL_GetWindowPixelDensity(window);
@@ -221,7 +222,6 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
     case SDL_EVENT_QUIT:
         return SDL_APP_SUCCESS;
     }
-    ImGui_ImplSDL3_ProcessEvent(event);
 
     return SDL_APP_CONTINUE;
 }
