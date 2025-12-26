@@ -15,7 +15,7 @@ void Gui::draw() {
     ImGui::InputScalarN("Clones", ImGuiDataType_U16, &m_context.clones_xy, 2,
                         &step_size, NULL, "%u", ImGuiInputTextFlags_None);
     ImGui::InputScalarN("Offset", ImGuiDataType_S64, &m_context.offset_xy, 2,
-                        &step_size, NULL, "%d", ImGuiInputTextFlags_None);
+                        &step_size, NULL, "%ld", ImGuiInputTextFlags_None);
     ImGui::DragScalar("Translation", ImGuiDataType_U32, &m_context.translation);
     ImGui::InputScalar("Font Size", ImGuiDataType_U16, &m_context.fontSize,
                        &step_size, NULL, "%u", ImGuiInputTextFlags_None);
