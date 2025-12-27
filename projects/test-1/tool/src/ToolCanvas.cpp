@@ -29,23 +29,9 @@ ToolCanvas::ToolCanvas(double width, double height, ToolContext &context)
 void ToolCanvas::prepare() { m_paragraph_builder->Reset(); }
 
 void ToolCanvas::draw() {
-    const SkScalar scale = 256.0f;
-    const SkScalar R = 0.45f * scale;
-    const SkScalar TAU = 6.2831853f;
-    SkPathBuilder path;
-    path.moveTo(R, 0.0f);
-    for (int i = 1; i < 7; ++i) {
-        SkScalar theta = 3 * i * TAU / 7;
-        path.lineTo(R * cos(theta), R * sin(theta));
-    }
-    path.close();
     SkPaint p;
     p.setAntiAlias(true);
-    m_canvas->clear(SK_ColorBLUE);
-    path.transform(SkMatrix::RotateDeg(m_context.totalTime * 0.01));
-    path.transform(SkMatrix::Translate(SkVector{0.5f * scale, 0.5f * scale}));
-    auto finalPath = path.detach();
-    m_canvas->drawPath(path.detach(), p);
+    m_canvas->clear(SK_ColorWHITE);
 
     sk_sp<SkTypeface> typeface =
         m_fontManager->matchFamilyStyle("Akzidenz-Grotesk Next", SkFontStyle());
@@ -65,7 +51,6 @@ void ToolCanvas::draw() {
     // draw paragraphs
     //
 
-    // Time time = wrapTime(m_context.totalTime * 0.001, m_context.duration);
     Time time = m_context.totalTime * 0.001;
 
     uvec2 contentSize{paragraph->getLongestLine(), paragraph->getHeight()};
