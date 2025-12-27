@@ -7,12 +7,11 @@
 struct ToolContext {
     std::string content;
     uint64_t totalTime;
-    int32_t translation;
-    uint16_t clones_xy[2];
+    uint32_t speed;
+    float direction;
     int64_t offset_xy[2];
     uint16_t fontSize;
     uint32_t contentWidth;
-    double duration;
 };
 
 class ToolCanvas : public Canvas {

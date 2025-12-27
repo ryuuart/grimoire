@@ -10,11 +10,12 @@
 #include "include/core/SkPaint.h"
 #include "include/core/SkPathBuilder.h"
 #include "modules/skunicode/include/SkUnicode_icu.h"
+#include <cmath>
 #include <cstdint>
 
 using namespace skia::textlayout;
 using namespace choreograph;
-using vec2 = glm::vec2;
+using namespace glm;
 
 ToolCanvas::ToolCanvas(double width, double height, ToolContext &context)
     : Canvas{width, height}, m_context{context},
@@ -46,9 +47,6 @@ void ToolCanvas::draw() {
     auto finalPath = path.detach();
     m_canvas->drawPath(path.detach(), p);
 
-    m_canvas->setMatrix(
-        SkMatrix::Translate(m_context.offset_xy[0], m_context.offset_xy[1]));
-
     sk_sp<SkTypeface> typeface =
         m_fontManager->matchFamilyStyle("Akzidenz-Grotesk Next", SkFontStyle());
     SkFont font{typeface, 32};
@@ -63,19 +61,33 @@ void ToolCanvas::draw() {
     std::unique_ptr<Paragraph> paragraph = m_paragraph_builder->Build();
     paragraph->layout(m_context.contentWidth);
 
-    auto translation = makeRamp(vec2(0, 0), vec2(m_context.translation, 0),
-                                m_context.duration, EaseNone());
-
+    //
     // draw paragraphs
-    for (uint8_t i = 0; i < m_context.clones_xy[0]; i++) {
-        for (uint8_t j = 0; j < m_context.clones_xy[1]; j++) {
-            paragraph->paint(
-                m_canvas, i * paragraph->getLongestLine(),
-                j * paragraph->getHeight() +
-                    translation
-                        ->getValue(wrapTime(m_context.totalTime * 0.001,
-                                            m_context.duration))
-                        .x);
+    //
+
+    // Time time = wrapTime(m_context.totalTime * 0.001, m_context.duration);
+    Time time = m_context.totalTime * 0.001;
+
+    uvec2 contentSize{paragraph->getLongestLine(), paragraph->getHeight()};
+    uvec2 canvasSize{m_canvas->getSurface()->width(),
+                     m_canvas->getSurface()->height()};
+    uvec2 clones{std::ceil(canvasSize.x / contentSize.x),
+                 std::ceil(canvasSize.y / contentSize.y)};
+    ivec2 translation = dvec2{std::cos(radians(m_context.direction)),
+                              -std::sin(radians(m_context.direction))} *
+                        static_cast<double>(m_context.speed) * time;
+    ivec2 startOffset = {
+        (translation.x + m_context.offset_xy[0]) % contentSize.x,
+        (translation.y + m_context.offset_xy[1]) % contentSize.y};
+
+    if (contentSize.x >= 1 && contentSize.y >= 1) {
+        for (int64_t i = -static_cast<int64_t>(contentSize.x) + startOffset.x;
+             i < canvasSize.x; i += contentSize.x) {
+            for (int64_t j =
+                     -static_cast<int64_t>(contentSize.y) + startOffset.y;
+                 j < canvasSize.y; j += contentSize.y) {
+                paragraph->paint(m_canvas, i, j);
+            }
         }
     }
 }
