@@ -11,6 +11,7 @@
 class Canvas {
   public:
     Canvas(double width, double height);
+    virtual ~Canvas();
 
     virtual void prepare() = 0;
     virtual void draw() = 0;

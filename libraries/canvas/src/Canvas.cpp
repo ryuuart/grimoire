@@ -19,6 +19,8 @@ Canvas::Canvas(double width, double height) {
     m_fontManager = SkFontMgr_New_CoreText(nullptr);
 }
 
+Canvas::~Canvas() { m_canvas = nullptr; }
+
 void Canvas::updateSize(int width, int height) {
     if (m_surface->width() != width || m_surface->height() != height) {
         m_surface = m_surface->makeSurface(width, height);
