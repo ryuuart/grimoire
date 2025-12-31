@@ -5,7 +5,7 @@ cc_binary(
     srcs = glob(["src/*.cpp", "src/*.h"]),
     copts = ["-I" + package_name() + "/src"],
     deps = [
-        "//libraries/canvas",
+        "//libraries/touchdesigner/core",
         "@imgui",
         "@sdl3",
         "@spdlog",

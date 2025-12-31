@@ -1,0 +1,51 @@
+load("@rules_apple//apple:macos.doc.bzl", "macos_bundle")
+load(
+    "@rules_apple//apple:versioning.bzl",
+    "apple_bundle_version",
+)
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "srcs",
+    srcs = [
+        "src/Parameters.h",
+        "src/Parameters.cpp",
+        "src/Typography.h",
+        "src/Typography.cpp",
+        "src/Plugin.h",
+        "src/Plugin.cpp",
+        "src/Painter.h",
+        "src/Painter.cpp",
+        "src/Scene.h",
+        "src/Scene.cpp",
+        "src/SigilText.h",
+        "src/SigilText.cpp",
+        "src/Entity.h",
+        "src/Components.h",
+        "src/Paintable.h",
+    ],
+    deps = [
+        "//libraries/touchdesigner/core",
+        "@touchdesigner//top",
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "@abseil-cpp//absl/container:flat_hash_set",
+    ],
+    alwayslink = True,
+)
+
+apple_bundle_version(
+    name = "version",
+    build_version = "0.1",
+)
+
+macos_bundle(
+    name = "text",
+    bundle_extension = "plugin",
+    bundle_id = "dev.cybersigilist.sigiltext",
+    infoplists = [":Info.plist"],
+    minimum_os_version = "26.1",
+    version = ":version",
+    deps = [
+        ":srcs",
+    ],
+)

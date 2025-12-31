@@ -13,17 +13,6 @@ bazel_dep(name = "gazelle", version = "0.47.0", dev_dependency = True)
 bazel_dep(name = "gazelle_cc", version = "0.4.0", dev_dependency = True)
 bazel_dep(name = "bazel_skylib", version = "1.8.2")
 
-# Hedron's Compile Commands Extractor for Bazel
-# https://github.com/hedronvision/bazel-compile-commands-extractor
-bazel_dep(name = "hedron_compile_commands", dev_dependency = True)
-git_override(
-    module_name = "hedron_compile_commands",
-    commit = "abb61a688167623088f8768cc9264798df6a9d10",
-    remote = "https://github.com/hedronvision/bazel-compile-commands-extractor.git",
-    # Replace the commit hash (above) with the latest (https://github.com/hedronvision/bazel-compile-commands-extractor/commits/main).
-    # Even better, set up Renovate and let it do the work for you (see "Suggestion: Updates" in the README).
-)
-
 http_archive(
     name = "sdl3",
     build_file = "@//third_party/sdl3:sdl3.BUILD",
@@ -51,7 +40,7 @@ http_archive(
 bazel_dep(name = "touchdesigner")
 git_override(
     module_name = "touchdesigner",
-    commit = "74b6148a9957c9677b545425a80ec42e71d68f89",
+    commit = "7050f739ee84fff64e6f839d599d4706b8aad160",
     remote = "https://github.com/ryuuart/touchdesigner-custom-operators.git",
 )
 
@@ -71,3 +60,5 @@ local_path_override(
 bazel_dep(name = "spdlog", version = "1.16.0.bcr.2")
 
 bazel_dep(name = "glm", version = "1.0.2")
+
+bazel_dep(name = "abseil-cpp", version = "20250814.1")
