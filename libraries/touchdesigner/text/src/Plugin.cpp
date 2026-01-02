@@ -47,21 +47,19 @@ void SigilTextPlugin::getGeneralInfo(TOP_GeneralInfo *ginfo,
 
 void SigilTextPlugin::execute(TOP_Output *output, const OP_Inputs *inputs,
                               void *reserved) {
-    auto image_info = scene.getImageInfo();
-    OP_SmartRef<TOP_Buffer> buffer = m_context->createOutputBuffer(
-        image_info.computeByteSize(image_info.minRowBytes()),
-        TOP_BufferFlags::Readable, nullptr);
-    scene.render(buffer->data);
-    // std::memcpy(buffer->data, pixmap.addr(), buffer->size);
+    renderer_.resize(500, 500);
+    renderer_.render(scene_);
 
+    OP_SmartRef<TOP_Buffer> buffer = m_context->createOutputBuffer(
+        renderer_.byteSize(), TOP_BufferFlags::Readable, nullptr);
+    renderer_.readPixel(buffer->data);
     TOP_UploadInfo uploadInfo = {};
-    uploadInfo.textureDesc.width = image_info.width();
-    uploadInfo.textureDesc.height = image_info.height();
+    uploadInfo.textureDesc.width = renderer_.width();
+    uploadInfo.textureDesc.height = renderer_.height();
     uploadInfo.textureDesc.pixelFormat = OP_PixelFormat::BGRA8Fixed;
     uploadInfo.textureDesc.texDim = OP_TexDim::e2D;
     uploadInfo.firstPixel = TOP_FirstPixel::TopLeft;
     uploadInfo.colorBufferIndex = 0;
-
     output->uploadBuffer(&buffer, uploadInfo, nullptr);
 }
 

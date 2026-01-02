@@ -1,6 +1,6 @@
 #pragma once
-#include "Canvas.h"
 #include "Parameters.h"
+#include "Renderer.h"
 #include "Scene.h"
 #include "TOP_CPlusPlusBase.h"
 
@@ -24,5 +24,6 @@ class SigilTextPlugin : public TD::TOP_CPlusPlusBase {
     const TD::OP_NodeInfo *m_info;
     Parameters m_parameters;
 
-    Scene scene;
+    Scene scene_;
+    Renderer renderer_;
 };

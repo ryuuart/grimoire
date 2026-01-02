@@ -16,7 +16,7 @@ struct SizeComponent {
     uint64_t height;
 };
 
-struct ContentComponent {
+struct TextContentComponent {
     std::string content;
 };
 
