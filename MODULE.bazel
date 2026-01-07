@@ -37,6 +37,14 @@ http_archive(
     strip_prefix = "Choreograph-34631980702f5d3745ac29d262712dd81b594ade"
 )
 
+http_archive(
+    name = "tracy",
+    build_file = "@//third_party/tracy:tracy.BUILD",
+    sha256 = "a1ecc73b0547512d4bab71278a14581763940118baef835a8033a675f3c8e06d",
+    strip_prefix = "tracy-0.13.1",
+    url = "https://github.com/wolfpld/tracy/archive/refs/tags/v0.13.1.zip",
+)
+
 bazel_dep(name = "touchdesigner")
 git_override(
     module_name = "touchdesigner",
@@ -62,3 +70,5 @@ bazel_dep(name = "spdlog", version = "1.16.0.bcr.2")
 bazel_dep(name = "glm", version = "1.0.2")
 
 bazel_dep(name = "abseil-cpp", version = "20250814.1")
+
+bazel_dep(name = "google_benchmark", version = "1.9.4")
