@@ -11,6 +11,7 @@ cc_binary(
         "@spdlog",
         "@choreograph",
         "@glm",
-        "@rules_cc//cc/runfiles"
+        "@rules_cc//cc/runfiles",
+        "@tracy"
     ],
 )

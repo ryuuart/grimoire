@@ -18,6 +18,7 @@
 #pragma once
 
 #include "CPlusPlus_Common.h"
+#include <string>
 
 namespace TD {
 class OP_Inputs;
@@ -28,14 +29,17 @@ class OP_ParameterManager;
 
 // Names of the parameters
 
-constexpr static char RotationName[] = "Rotation";
-constexpr static char RotationLabel[] = "Rotation";
+constexpr static char ContentName[] = "Content";
+constexpr static char ContentLabel[] = "Content";
 
-constexpr static char ScaleName[] = "Scale";
-constexpr static char ScaleLabel[] = "Scale";
+constexpr static char TypefamilyName[] = "Typefamily";
+constexpr static char TypefamilyLabel[] = "Type Family";
 
-constexpr static char CountName[] = "Count";
-constexpr static char CountLabel[] = "Count";
+constexpr static char ForegroundcolorName[] = "Foregroundcolor";
+constexpr static char ForegroundcolorLabel[] = "Foreground Color";
+
+constexpr static char FontsizeName[] = "Fontsize";
+constexpr static char FontsizeLabel[] = "Font Size";
 
 #pragma endregion
 
@@ -47,13 +51,16 @@ class Parameters {
   public:
     static void setup(TD::OP_ParameterManager *);
 
-    // Rotation
-    static double evalRotation(const TD::OP_Inputs *inputs);
+    // Content
+    static std::string evalContent(const TD::OP_Inputs *inputs);
 
-    // Scale
-    static const TD::OP_CHOPInput *evalScale(const TD::OP_Inputs *inputs);
+    // Type Family
+    static std::string evalTypefamily(const TD::OP_Inputs *inputs);
 
-    // Count
-    static int evalCount(const TD::OP_Inputs *inputs);
+    // Foreground Color
+    static TD::Color evalForegroundcolor(const TD::OP_Inputs *inputs);
+
+    // Font Size
+    static int evalFontsize(const TD::OP_Inputs *inputs);
 };
 #pragma endregion

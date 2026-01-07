@@ -22,7 +22,7 @@ class SigilTextPlugin : public TD::TOP_CPlusPlusBase {
     TD::OP_SmartRef<TD::OP_TOPDownloadResult> m_prev_down_res;
 
     const TD::OP_NodeInfo *m_info;
-    Parameters m_parameters;
+    Parameters parameters_;
 
     Scene scene_;
     Renderer renderer_;

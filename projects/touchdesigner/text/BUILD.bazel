@@ -26,6 +26,10 @@ cc_library(
         "@touchdesigner//top",
         "@abseil-cpp//absl/container:flat_hash_map",
         "@abseil-cpp//absl/container:flat_hash_set",
+        "@skia//:core",
+        "@skia//:fontmgr_coretext",
+        "@skia//:skunicode_icu",
+        "@skia//:skshaper_harfbuzz"
     ],
     alwayslink = True,
 )

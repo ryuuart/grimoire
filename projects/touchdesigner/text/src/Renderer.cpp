@@ -27,9 +27,10 @@ void Renderer::resize(uint32_t width, uint32_t height) {
 void Renderer::render(const Scene &scene) {
     auto canvas = surface_->getCanvas();
 
-    canvas->drawString(scene.text.content->content.c_str(), 10, 10,
-                       scene.text.style->font,
-                       scene.text.style->foregroundColor);
+    canvas->clear(SK_ColorTRANSPARENT);
+
+    canvas->drawTextBlob(scene.text.content->textBlob, 0, 0,
+                         scene.text.style->foregroundColor);
 }
 
 uint32_t Renderer::width() { return surface_->width(); }
