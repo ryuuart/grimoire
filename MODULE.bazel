@@ -5,12 +5,17 @@ module(
 
 http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
+git_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+
+bazel_dep(name = "platforms", version = "1.0.0")
 bazel_dep(name = "apple_support", version = "1.24.5", repo_name = "build_bazel_apple_support")
 bazel_dep(name = "rules_apple", version = "4.3.2")
 bazel_dep(name = "rules_cc", version = "0.2.14")
 bazel_dep(name = "rules_foreign_cc", version = "0.15.1")
+
 bazel_dep(name = "gazelle", version = "0.47.0", dev_dependency = True)
 bazel_dep(name = "gazelle_cc", version = "0.4.0", dev_dependency = True)
+
 bazel_dep(name = "bazel_skylib", version = "1.8.2")
 
 http_archive(
@@ -32,17 +37,17 @@ http_archive(
 http_archive(
     name = "choreograph",
     build_file = "@//third_party/choreograph:choreograph.BUILD",
-    url = "https://github.com/sansumbrella/Choreograph/archive/34631980702f5d3745ac29d262712dd81b594ade.zip",
     sha256 = "57d2a2b29813b4d96402d29579d03b6b9ccbea49b8bbed80bbdcd425bafb8d31",
-    strip_prefix = "Choreograph-34631980702f5d3745ac29d262712dd81b594ade"
+    strip_prefix = "Choreograph-34631980702f5d3745ac29d262712dd81b594ade",
+    url = "https://github.com/sansumbrella/Choreograph/archive/34631980702f5d3745ac29d262712dd81b594ade.zip",
 )
 
-http_archive(
+git_repository(
     name = "tracy",
     build_file = "@//third_party/tracy:tracy.BUILD",
-    sha256 = "a1ecc73b0547512d4bab71278a14581763940118baef835a8033a675f3c8e06d",
-    strip_prefix = "tracy-0.13.1",
-    url = "https://github.com/wolfpld/tracy/archive/refs/tags/v0.13.1.zip",
+    commit = "05cceee0df3b8d7c6fa87e9638af311dbabc63cb",
+    patch_cmds = ["mv .git dot_git"],
+    remote = "https://github.com/wolfpld/tracy.git",
 )
 
 bazel_dep(name = "touchdesigner")
@@ -66,9 +71,6 @@ local_path_override(
 )
 
 bazel_dep(name = "spdlog", version = "1.16.0.bcr.2")
-
 bazel_dep(name = "glm", version = "1.0.2")
-
 bazel_dep(name = "abseil-cpp", version = "20250814.1")
-
 bazel_dep(name = "google_benchmark", version = "1.9.4")

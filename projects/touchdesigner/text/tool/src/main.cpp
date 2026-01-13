@@ -20,6 +20,8 @@
 #include "include/core/SkPixmap.h"
 #include "rules_cc/cc/runfiles/runfiles.h"
 #include "spdlog/spdlog.h"
+#include "tracy/Tracy.hpp"
+#include <client/TracyProfiler.hpp>
 #include <cstring>
 #include <memory>
 #include <utility>
@@ -133,6 +135,10 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
 }
 
 SDL_AppResult SDL_AppIterate(void *appstate) {
+    if (TracyIsStarted) {
+        ZoneScopedN("Iteration");
+    }
+
     AppContext *appContext = static_cast<AppContext *>(appstate);
     SdlContext &sdlContext = appContext->sdlContext;
     ToolContext &toolContext = appContext->toolContext;
@@ -199,6 +205,8 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
 
     // Submit the command buffer
     SDL_SubmitGPUCommandBuffer(command_buffer);
+
+    FrameMark;
 
     return SDL_APP_CONTINUE;
 }

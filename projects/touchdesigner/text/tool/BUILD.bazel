@@ -4,6 +4,7 @@ cc_binary(
     name = "tool",
     srcs = glob(["src/*.cpp", "src/*.h"]),
     copts = ["-I" + package_name() + "/src"],
+    defines = ["TRACY_ENABLE"],
     deps = [
         "//libraries/touchdesigner/core",
         "@imgui",
@@ -12,6 +13,6 @@ cc_binary(
         "@choreograph",
         "@glm",
         "@rules_cc//cc/runfiles",
-        "@tracy"
+        "@tracy//:TracyClient"
     ],
 )
