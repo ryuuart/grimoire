@@ -5,7 +5,7 @@
 #include "include/core/SkImageInfo.h"
 #include "include/core/SkRefCnt.h"
 #include "include/core/SkSurface.h"
-#include "include/ports/SkFontMgr_mac_ct.h"
+#include "FontManager.h"
 #include <cstddef>
 
 Canvas::Canvas(double width, double height) {
@@ -15,8 +15,7 @@ Canvas::Canvas(double width, double height) {
 
     m_canvas = m_surface->getCanvas();
 
-    SkFontMgr_New_CoreText(nullptr);
-    m_fontManager = SkFontMgr_New_CoreText(nullptr);
+    m_fontManager = makeDefaultFontManager();
 }
 
 Canvas::~Canvas() { m_canvas = nullptr; }

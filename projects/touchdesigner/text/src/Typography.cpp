@@ -1,8 +1,8 @@
 #include "Typography.h"
 #include "include/core/SkString.h"
-#include "include/ports/SkFontMgr_mac_ct.h"
+#include "FontManager.h"
 
-Typography::Typography() { font_manager_ = SkFontMgr_New_CoreText(nullptr); }
+Typography::Typography() { font_manager_ = makeDefaultFontManager(); }
 
 Typography::FontBook::const_iterator Typography::scanFonts() {
     for (int i = 0; i < font_manager_->countFamilies(); i++) {

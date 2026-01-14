@@ -25,6 +25,7 @@
 #include <cstring>
 #include <memory>
 #include <utility>
+#include "Window.h"
 
 using rules_cc::cc::runfiles::Runfiles;
 
@@ -55,9 +56,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
     float main_scale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
     std::pair<double, double> window_size = {640 * main_scale,
                                              480 * main_scale};
-    SDL_WindowFlags window_flags = SDL_WINDOW_METAL | SDL_WINDOW_RESIZABLE |
-                                   SDL_WINDOW_HIGH_PIXEL_DENSITY |
-                                   SDL_WINDOW_HIDDEN;
+    SDL_WindowFlags window_flags = getWindowFlags();
     SDL_Window *window = SDL_CreateWindow("Testerino", window_size.first,
                                           window_size.second, window_flags);
     if (window == nullptr) {
@@ -69,8 +68,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
     SDL_ShowWindow(window);
 
     // Setup GPU Device
-    SDL_GPUDevice *gpu_device =
-        SDL_CreateGPUDevice(SDL_GPU_SHADERFORMAT_METALLIB, true, nullptr);
+    SDL_GPUDevice *gpu_device = makeGpuDevice();
     if (gpu_device == nullptr) {
         spdlog::info("Couldn't create GPU device: %s", SDL_GetError());
         return SDL_APP_FAILURE;

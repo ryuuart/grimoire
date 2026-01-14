@@ -6,7 +6,6 @@
 #include "include/core/SkPixmap.h"
 #include "include/core/SkRefCnt.h"
 #include "include/core/SkSurface.h"
-#include "include/ports/SkFontMgr_mac_ct.h"
 
 class Canvas {
   public:

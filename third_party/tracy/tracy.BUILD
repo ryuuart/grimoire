@@ -1,5 +1,13 @@
 load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
 
+config_setting(
+    name = "linux_x86_64",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+)
+
 filegroup(
     name = "all_srcs",
     srcs = glob(["**/*"]),
@@ -8,17 +16,25 @@ filegroup(
 
 cmake(
     name = "TracyClient",
+    cache_entries = {
+        "TRACY_ENABLE": "ON",
+        "TRACY_ON_DEMAND": "ON",
+    },
     generate_args = [
         "-G Ninja",
     ],
-    cache_entries = {
-        "TRACY_ENABLE": "ON",
-        "TRACY_ON_DEMAND": "ON"
-    },
+    includes = [
+        "public/client",
+        "public/common",
+        "public/tracy",
+    ],
     lib_source = ":all_srcs",
-    includes = ["public/client", "public/common", "public/tracy"],
-    out_static_libs = ["libTracyClient.a"],
     out_include_dir = "include/tracy",
+    out_lib_dir = select({
+        ":linux_x86_64": "lib64",
+        "//conditions:default": "",
+    }),
+    out_static_libs = ["libTracyClient.a"],
     visibility = ["//visibility:public"],
 )
 
@@ -50,5 +66,5 @@ genrule(
         cp build/Release/tracy-profiler $$ROOT_DIR/$(location tracy-profiler)
     """,
     executable = True,
-    tags = ["no-sandbox"]
+    tags = ["no-sandbox"],
 )

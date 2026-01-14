@@ -1,0 +1,5 @@
+#include "Window.h"
+
+const SDL_WindowFlags SHARED_WINDOW_FLAGS = SDL_WINDOW_RESIZABLE |
+       SDL_WINDOW_HIGH_PIXEL_DENSITY |
+       SDL_WINDOW_HIDDEN;

@@ -2,17 +2,29 @@ load("@rules_cc//cc:defs.bzl", "cc_binary")
 
 cc_binary(
     name = "tool",
-    srcs = glob(["src/*.cpp", "src/*.h"]),
+    srcs = glob([
+        "src/*.h",
+    ]) + [
+        "src/Gui.cpp",
+        "src/SdlDrawable.cpp",
+        "src/ToolCanvas.cpp",
+        "src/WindowShared.cpp",
+        "src/main.cpp",
+    ] + select({
+        "@platforms//os:linux": ["src/LinuxWindow.cpp"],
+        "@platforms//os:macos": ["src/MacosWindow.cpp"],
+        "@platforms//os:windows": [],
+    }),
     copts = ["-I" + package_name() + "/src"],
     defines = ["TRACY_ENABLE"],
     deps = [
         "//libraries/touchdesigner/core",
-        "@imgui",
-        "@sdl3",
-        "@spdlog",
         "@choreograph",
         "@glm",
+        "@imgui",
         "@rules_cc//cc/runfiles",
-        "@tracy//:TracyClient"
+        "@sdl3",
+        "@spdlog",
+        "@tracy//:TracyClient",
     ],
 )

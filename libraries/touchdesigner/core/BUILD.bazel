@@ -1,16 +1,23 @@
+load("@bazel_skylib//lib:selects.bzl", "selects")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 filegroup(
     name = "srcs",
     srcs = [
         "src/Canvas.cpp",
-    ],
+    ] + selects.with_or({
+        ("@platforms//os:linux", "@platforms//os:windows"): [
+            "src/FontManagerLinuxWindows.cpp",
+        ],
+        "@platforms//os:macos": ["src/FontManagerMacOs.cpp"],
+    }),
 )
 
 filegroup(
     name = "hdrs",
     srcs = [
         "src/Canvas.h",
+        "src/FontManager.h",
     ],
 )
 
@@ -19,11 +26,20 @@ cc_library(
     srcs = [":srcs"],
     hdrs = [":hdrs"],
     includes = ["src"],
+    visibility = ["//visibility:public"],
     deps = [
         "@skia//:core",
-        "@skia//:fontmgr_coretext",
         "@skia//:skparagraph_harfbuzz_skunicode",
-        "@skia//:skunicode_icu"
-    ],
-    visibility = ["//visibility:public"]
+        "@skia//:skunicode_icu",
+    ] + selects.with_or({
+        ("@platforms//os:linux", "@platforms//os:windows"): [
+            "@skia//:freetype_support",
+            "@skia//:fontmgr_empty_freetype",
+            "@skia//:fontmgr_fontconfig",
+        ],
+        "@platforms//os:macos": [
+            "@skia//:fontmgr_coretext",
+            "@skia//:skshaper_coretext",
+        ],
+    }),
 )
