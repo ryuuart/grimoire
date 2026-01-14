@@ -15,7 +15,7 @@ cmake(
     lib_source = ":all_srcs",
     out_lib_dir = select({
         "@platforms//os:linux": "lib64",
-        "//conditions:default": "",
+        "//conditions:default": "lib",
     }),
     out_shared_libs = select({
         "@platforms//os:linux": ["libSDL3.so"],

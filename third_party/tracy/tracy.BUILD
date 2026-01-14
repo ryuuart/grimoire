@@ -32,7 +32,7 @@ cmake(
     out_include_dir = "include/tracy",
     out_lib_dir = select({
         ":linux_x86_64": "lib64",
-        "//conditions:default": "",
+        "//conditions:default": "lib",
     }),
     out_static_libs = ["libTracyClient.a"],
     visibility = ["//visibility:public"],
