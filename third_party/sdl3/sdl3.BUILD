@@ -18,7 +18,7 @@ cmake(
         "//conditions:default": "lib",
     }),
     out_shared_libs = select({
-        "@platforms//os:linux": ["libSDL3.so"],
+        "@platforms//os:linux": ["libSDL3.so", "libSDL3.so.0"],
         "@platforms//os:macos": ["libSDL3.0.dylib"],
     }),
     visibility = ["//visibility:public"],

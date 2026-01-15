@@ -45,7 +45,7 @@ genrule(
     outs = ["tracy-profiler"],
     cmd = """
         ROOT_DIR=$$PWD
-        export PATH="$$PATH:/usr/local/bin:/opt/homebrew/bin"
+        export PATH="$$PATH:~/.local/bin:/usr/local/bin:/opt/homebrew/bin"
         ORIGINAL_SOURCE_DIR=$$(dirname $(execpath @tracy//:CMakeLists.txt))
 
         if [ ! -d "tracy_source" ]; then
