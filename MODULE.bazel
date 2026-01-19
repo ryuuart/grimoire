@@ -10,14 +10,18 @@ git_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:git.bzl", "g
 bazel_dep(name = "platforms", version = "1.0.0")
 bazel_dep(name = "apple_support", version = "2.1.0", repo_name = "build_bazel_apple_support")
 bazel_dep(name = "rules_apple", version = "4.3.3")
+bazel_dep(name = "bazel_skylib", version = "1.8.2")
+bazel_dep(name = "toolchains_llvm", version = "1.6.0")
 bazel_dep(name = "rules_cc", version = "0.2.14")
 bazel_dep(name = "rules_foreign_cc", version = "0.15.1")
+bazel_dep(name = "googletest", version = "1.17.0.bcr.2")
+bazel_dep(name = "spdlog", version = "1.16.0.bcr.2")
+bazel_dep(name = "glm", version = "1.0.1")
+bazel_dep(name = "abseil-cpp", version = "20250814.1")
+bazel_dep(name = "google_benchmark", version = "1.9.4")
 
 bazel_dep(name = "gazelle", version = "0.47.0", dev_dependency = True)
 bazel_dep(name = "gazelle_cc", version = "0.4.0", dev_dependency = True)
-
-bazel_dep(name = "bazel_skylib", version = "1.8.2")
-bazel_dep(name = "toolchains_llvm", version = "1.6.0")
 
 # Configure and register the toolchain.
 llvm = use_extension("@toolchains_llvm//toolchain/extensions:llvm.bzl", "llvm")
@@ -46,6 +50,13 @@ http_archive(
     sha256 = "999358dd8e78b65900bd49db57b88ae2105ac8d7018d6a52fb9b9ae67f122592",
     strip_prefix = "imgui-1.92.5",
     url = "https://github.com/ocornut/imgui/archive/refs/tags/v1.92.5.zip",
+)
+
+http_archive(
+    name = "marl",
+    sha256 = "f1bdac37e0e2cd2240a0de468c2d4218003c02a2c80d9daa415e80e219684df3",
+    strip_prefix = "marl-23bbc9bf0017ba75844d5be5b12b15c0134ca276",
+    url = "https://github.com/google/marl/archive/23bbc9bf0017ba75844d5be5b12b15c0134ca276.zip",
 )
 
 http_archive(
@@ -83,8 +94,3 @@ local_path_override(
     module_name = "skia_user_config",
     path = "third_party/skia/config",
 )
-
-bazel_dep(name = "spdlog", version = "1.16.0.bcr.2")
-bazel_dep(name = "glm", version = "1.0.1")
-bazel_dep(name = "abseil-cpp", version = "20250814.1")
-bazel_dep(name = "google_benchmark", version = "1.9.4")
