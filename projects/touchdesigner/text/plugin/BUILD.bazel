@@ -1,0 +1,37 @@
+load("@rules_apple//apple:macos.doc.bzl", "macos_bundle")
+load(
+    "@rules_apple//apple:versioning.bzl",
+    "apple_bundle_version",
+)
+
+cc_library(
+    name = "lib",
+    srcs = [
+        "src/Parameters.cpp",
+        "src/Parameters.h",
+        "src/Plugin.cpp",
+        "src/Plugin.h",
+    ],
+    deps = [
+        "//projects/touchdesigner/text/lib",
+        "@touchdesigner//top",
+    ],
+    alwayslink = True,
+)
+
+apple_bundle_version(
+    name = "version",
+    build_version = "0.1",
+)
+
+macos_bundle(
+    name = "text",
+    bundle_extension = "plugin",
+    bundle_id = "dev.cybersigilist.sigiltext",
+    infoplists = [":Info.plist"],
+    minimum_os_version = "26.1",
+    version = ":version",
+    deps = [
+        ":lib",
+    ],
+)

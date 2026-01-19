@@ -1,0 +1,29 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "lib",
+    srcs = [
+        "src/Renderer.cpp",
+        "src/Text.cpp",
+        "src/Typography.cpp",
+    ],
+    hdrs = [
+        "src/Components.h",
+        "src/Renderer.h",
+        "src/Scene.h",
+        "src/Text.h",
+        "src/Typography.h",
+    ],
+    includes = ["src"],
+    visibility = ["//projects/touchdesigner/text:__subpackages__"],
+    deps = [
+        "//libraries/touchdesigner/core",
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "@abseil-cpp//absl/container:flat_hash_set",
+        "@skia//:core",
+        "@skia//:skshaper_core",
+        "@skia//:skshaper_harfbuzz",
+        "@skia//:skshaper_unicode",
+        "@skia//:skunicode_icu",
+    ],
+)
