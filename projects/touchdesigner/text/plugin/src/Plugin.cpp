@@ -87,7 +87,7 @@ void SigilTextPlugin::execute(TOP_Output *output, const OP_Inputs *inputs,
     text.shaper->shaper->shape(content.c_str(), size, *font, *bidi, *script,
                                *language, nullptr, 0, texture_desc.width,
                                &run_handler);
-    text.content->textBlob = run_handler.makeBlob();
+    text.shaper->textBlob = run_handler.makeBlob();
     renderer_.resize(texture_desc.width, texture_desc.height);
     renderer_.render(scene_);
 

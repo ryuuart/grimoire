@@ -29,7 +29,7 @@ void Renderer::render(const Scene &scene) {
 
     canvas->clear(SK_ColorTRANSPARENT);
 
-    canvas->drawTextBlob(scene.text.content->textBlob, 0, 0,
+    canvas->drawTextBlob(scene.text.shaper->textBlob, 0, 0,
                          scene.text.style->foregroundColor);
 }
 

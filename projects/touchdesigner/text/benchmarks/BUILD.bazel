@@ -2,6 +2,14 @@ load("@rules_cc//cc:defs.bzl", "cc_binary")
 
 cc_binary(
     name = "text_rendering",
-    srcs = ["text_rendering.cpp"],
-    deps = ["@google_benchmark//:benchmark"],
+    srcs = [
+        "main.cpp",
+        "marl_bench.h",
+        "text_rendering.cpp",
+    ],
+    deps = [
+        "//projects/touchdesigner/text/lib",
+        "@google_benchmark//:benchmark",
+        "@marl",
+    ],
 )
