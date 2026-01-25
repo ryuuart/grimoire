@@ -21,10 +21,10 @@ class Canvas {
 
   protected:
     sk_sp<SkFontMgr> m_fontManager;
+    sk_sp<SkSurface> m_surface;
     SkCanvas *m_canvas;
 
   private:
-    sk_sp<SkSurface> m_surface;
     SkPixmap m_pixmap;
 };
 

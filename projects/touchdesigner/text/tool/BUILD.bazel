@@ -16,7 +16,9 @@ cc_binary(
         "@platforms//os:windows": [],
     }),
     copts = ["-I" + package_name() + "/src"],
-    defines = ["TRACY_ENABLE"],
+    defines = [
+        "TRACY_ENABLE",
+    ],
     deps = [
         "//libraries/touchdesigner/core",
         "@choreograph",

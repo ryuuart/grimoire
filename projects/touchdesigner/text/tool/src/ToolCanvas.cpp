@@ -12,6 +12,9 @@
 #include "modules/skunicode/include/SkUnicode_icu.h"
 #include <cmath>
 #include <cstdint>
+#include <tracy/TracyC.h>
+#include <tracy/Tracy.hpp>
+#include "include/core/SkTypes.h"
 
 using namespace skia::textlayout;
 using namespace choreograph;
@@ -45,7 +48,8 @@ void ToolCanvas::draw() {
     m_paragraph_builder->pushStyle(textStyle);
     m_paragraph_builder->addText(m_context.content.c_str());
     std::unique_ptr<Paragraph> paragraph = m_paragraph_builder->Build();
-    paragraph->layout(m_context.contentWidth);
+    paragraph->layout(std::numeric_limits<float>::infinity());
+    paragraph->layout(std::max(paragraph->getMinIntrinsicWidth() + 1, static_cast<SkScalar>(m_context.contentWidth)));
 
     //
     // draw paragraphs

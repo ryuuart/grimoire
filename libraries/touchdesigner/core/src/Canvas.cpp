@@ -16,6 +16,8 @@ Canvas::Canvas(double width, double height) {
     m_canvas = m_surface->getCanvas();
 
     m_fontManager = makeDefaultFontManager();
+
+    m_canvas->clipRect(SkRect::MakeIWH(m_surface->width(), m_surface->height()));
 }
 
 Canvas::~Canvas() { m_canvas = nullptr; }
@@ -24,6 +26,7 @@ void Canvas::updateSize(int width, int height) {
     if (m_surface->width() != width || m_surface->height() != height) {
         m_surface = m_surface->makeSurface(width, height);
         m_canvas = m_surface->getCanvas();
+        m_canvas->clipRect(SkRect::MakeIWH(m_surface->width(), m_surface->height()));
     }
 }
 
