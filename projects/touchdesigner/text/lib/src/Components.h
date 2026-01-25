@@ -2,51 +2,55 @@
 
 #include "include/core/SkFont.h"
 #include "include/core/SkPaint.h"
+#include <memory>
+#include <string>
+
+#ifdef USE_SKIA_SHAPED_TEXT
 #include "modules/skshaper/include/SkShaper.h"
-#include "modules/skunicode/include/SkUnicode.h"
+#endif
+#ifdef USE_SKIA_PARAGRAPH_TEXT
 #include "modules/skparagraph/include/TextStyle.h"
 #include "modules/skparagraph/include/ParagraphStyle.h"
 #include "modules/skparagraph/include/Paragraph.h"
 #include "modules/skparagraph/include/ParagraphBuilder.h"
-#include <cstdint>
-#include <memory>
-#include <string>
+#endif
 
-struct TransformComponent {
-    uint64_t x;
-    uint64_t y;
-};
-
-struct SizeComponent {
-    uint64_t width;
-    uint64_t height;
-};
-
-struct TextContentComponent {
+struct ContentComponent {
     std::string content{};
 };
 
-struct TextShaperComponent {
-    std::unique_ptr<SkShaper> shaper;
-    sk_sp<SkUnicode> unicode;
-    sk_sp<SkTextBlob> textBlob{};
-    std::unique_ptr<SkShaper::FontRunIterator> font;
-    std::unique_ptr<SkShaper::ScriptRunIterator> script;
-    std::unique_ptr<SkShaper::BiDiRunIterator> bidi;
-    std::unique_ptr<SkShaper::LanguageRunIterator> language;
-};
-
 struct StyleComponent {
-    SkPaint foregroundColor;
-    SkFont font;
-    sk_sp<SkTypeface> typeface;
-    skia::textlayout::ParagraphStyle paragraphStyle;
-    skia::textlayout::TextStyle textStyle;
+    std::array<float, 4> foregroundColor{0.0f, 0.0f, 0.0f, 0.0f};
+    std::string typeFamily{""};
+    float fontSize{0.0f};
 };
 
-struct TextParagraphComponent {
-    sk_sp<SkUnicode> unicode;
-    sk_sp<skia::textlayout::FontCollection> fontCollection;
-    std::unique_ptr<skia::textlayout::Paragraph> paragraph;
-    std::unique_ptr<skia::textlayout::ParagraphBuilder> builder;
+struct SkiaStyleComponent {
+    SkPaint foregroundColor;
 };
+
+#ifdef USE_SKIA_SHAPED_TEXT
+struct SkiaShapedTextComponent {
+    struct Style {
+        SkFont font;
+        sk_sp<SkTypeface> typeface;
+    };
+
+    std::unique_ptr<SkShaper> shaper;
+    sk_sp<SkTextBlob> textBlob{};
+    Style style;
+};
+#endif
+
+#ifdef USE_SKIA_PARAGRAPH_TEXT
+struct SkiaParagraphTextComponent {
+    struct Style {
+        skia::textlayout::ParagraphStyle paragraphStyle;
+    };
+
+    sk_sp<skia::textlayout::FontCollection> fontCollection;
+    std::unique_ptr<skia::textlayout::ParagraphBuilder> builder;
+    std::unique_ptr<skia::textlayout::Paragraph> paragraph;
+    Style style;
+};
+#endif

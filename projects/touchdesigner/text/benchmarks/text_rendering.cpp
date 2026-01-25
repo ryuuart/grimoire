@@ -6,11 +6,9 @@
 #include "marl_bench.h"
 #include "Scene.h"
 #include "Renderer.h"
-#include "Typography.h"
-#include "external/+_repo_rules+marl/include/marl/waitgroup.h"
+#include "marl/waitgroup.h"
 
-BENCHMARK_DEFINE_F(Schedule, TextRender)(benchmark::State& state) {
-    Scene scene;
+BENCHMARK_DEFINE_F(Schedule, TextRender)(benchmark::State &state) {
     std::u8string benchmark_paragraph_content = u8R"stress(
 The fundamental challenge of rendering begins when the Unicode Bidirectional Algorithm (UBA)
 encounters forced overrides like ‪ (LRE) and ‫ (RLE) interspersed with script-heavy clusters
@@ -32,25 +30,18 @@ geometric puzzle, balancing the $x$-advance of a Devanagari cluster against the
 fixed-width $1em$ grid of a Chinese glyph, all while handling the contextual
 substitution required by modern variable fonts.
 )stress";
-    scene.text.content->content = std::string(benchmark_paragraph_content.begin(), benchmark_paragraph_content.end());
+    scene_->text.content.content = std::string(benchmark_paragraph_content.begin(), benchmark_paragraph_content.end()) + std::string(benchmark_paragraph_content.begin(), benchmark_paragraph_content.end()) + std::string(benchmark_paragraph_content.begin(), benchmark_paragraph_content.end());
+    scene_->text.style.fontSize = 1024;
 
     run(state, [&](int numTasks) {
-      for (auto _ : state) {
-        marl::WaitGroup wg;
-        wg.add(numTasks);
-        scene.text.paragraph->builder->Reset();
-        scene.text.paragraph->builder->addText(scene.text.content->content.c_str());
-        for (auto i = 0; i < numTasks; i++) {
-            marl::schedule([=] {
-                Renderer renderer;
-                renderer.resize(100, 100);
-                renderer.render(scene);
-                wg.done();
-            });
+        for (auto _: state) {
+            Renderer renderer{Renderer::RenderConfig{.width = 5000, .height = 5000, .parallel = true}};
+            textSystem_->update(renderer.width());
+            for (auto i = 0; i < numTasks; i++) {
+                renderer.render(*scene_);
+            }
         }
-        wg.wait();
-      }
     });
 }
-BENCHMARK_REGISTER_F(Schedule, TextRender)->Apply(Schedule::args)->Unit(benchmark::kMillisecond);
 
+BENCHMARK_REGISTER_F(Schedule, TextRender)->Apply(Schedule::args<1>)->Unit(benchmark::kMillisecond);

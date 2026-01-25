@@ -11,6 +11,8 @@ cc_library(
         "src/Parameters.h",
         "src/Plugin.cpp",
         "src/Plugin.h",
+        "src/TDBuffer.cpp",
+        "src/TDBuffer.h",
     ],
     deps = [
         "//projects/touchdesigner/text/lib",

@@ -13,6 +13,8 @@
 // limitations under the License.
 #pragma once
 
+#include "Scene.h"
+#include "TextSystem.h"
 #include "marl/scheduler.h"
 #include "marl/thread.h"
 #include "benchmark/benchmark.h"
@@ -25,7 +27,10 @@
 
 class Schedule : public benchmark::Fixture {
  public:
-  void SetUp(const ::benchmark::State&) {}
+  void SetUp(const ::benchmark::State&) {
+    scene_ = std::make_unique<Scene>();
+    textSystem_ = std::make_unique<TextSystem>(*scene_);
+  }
 
   void TearDown(const ::benchmark::State&) {}
 
@@ -89,4 +94,8 @@ class Schedule : public benchmark::Fixture {
   static int numTasks(const ::benchmark::State& state) {
     return static_cast<int>(state.range(0));
   }
+
+protected:
+  std::unique_ptr<Scene> scene_;
+  std::unique_ptr<TextSystem> textSystem_;
 };

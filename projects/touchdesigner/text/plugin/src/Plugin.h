@@ -1,7 +1,7 @@
 #pragma once
 #include "Parameters.h"
-#include "Renderer.h"
 #include "Scene.h"
+#include "TextSystem.h"
 #include "TOP_CPlusPlusBase.h"
 
 class SigilTextPlugin : public TD::TOP_CPlusPlusBase {
@@ -25,5 +25,5 @@ class SigilTextPlugin : public TD::TOP_CPlusPlusBase {
     Parameters parameters_;
 
     Scene scene_;
-    Renderer renderer_;
+    std::unique_ptr<TextSystem> textSystem_;
 };
