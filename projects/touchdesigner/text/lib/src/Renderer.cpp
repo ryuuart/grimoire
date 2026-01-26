@@ -1,5 +1,6 @@
 #include "Renderer.h"
 
+#include "GpuUtils.h"
 #include "include/core/SkPicture.h"
 #include "include/core/SkPictureRecorder.h"
 #include "glm/vec2.hpp"
@@ -7,19 +8,38 @@
 #include "marl/scheduler.h"
 #include "marl/waitgroup.h"
 #include "marl/defer.h"
+#include "include/gpu/graphite/Surface.h"
 
-Renderer::Renderer(const RenderConfig config) : parallel_(config.parallel) {
+using namespace skgpu::graphite;
+
+Renderer::Renderer(const RenderConfig config) : parallel_(config.parallel), useGpu_(config.useGpu) {
     const SkImageInfo image_info = SkImageInfo::MakeN32Premul(static_cast<int>(config.width), static_cast<int>(config.height))
-        .makeColorType(RENDERER_COLOR_TYPE);
-    surface_ = SkSurfaces::Raster(image_info);
+        .makeColorType(RENDERER_COLOR_TYPE)
+        .makeColorSpace(SkColorSpace::MakeSRGB());
+    if (useGpu_) {
+        context_->recorder = MainGpuContext->makeRecorder();
+        surface_ = SkSurfaces::RenderTarget(context_->recorder.get(), image_info);
+    } else {
+        surface_ = SkSurfaces::Raster(image_info);
+    }
 }
 
-Renderer::Renderer(const RenderConfig config, BufferProvider &buffer_provider) : parallel_(config.parallel) {
+Renderer::Renderer(const RenderConfig config, BufferProvider &buffer_provider) : parallel_(config.parallel), useGpu_(config.useGpu) {
     const SkImageInfo image_info = SkImageInfo::MakeN32Premul(static_cast<int>(config.width), static_cast<int>(config.height))
-        .makeColorType(RENDERER_COLOR_TYPE);
+        .makeColorType(RENDERER_COLOR_TYPE)
+        .makeColorSpace(SkColorSpace::MakeSRGB());
     const size_t row_bytes = image_info.minRowBytes();
     const size_t byte_size = image_info.computeByteSize(row_bytes);
-    surface_ = SkSurfaces::WrapPixels(image_info, buffer_provider.provide(byte_size), row_bytes);
+    if (useGpu_) {
+        surface_props_ = SkSurfaceProps{SkSurfaceProps::kUseDeviceIndependentFonts_Flag, kUnknown_SkPixelGeometry};
+        RecorderOptions recorder_options;
+        recorder_options.fGpuBudgetInBytes = static_cast<size_t>(512) * 1024 * 1024 * 1024;
+        context_->recorder = MainGpuContext->makeRecorder();
+        context_->pixmap = SkPixmap{image_info, buffer_provider.provide(byte_size), row_bytes};
+        surface_ = SkSurfaces::RenderTarget(context_->recorder.get(), image_info, skgpu::Mipmapped::kNo, &surface_props_);
+    } else {
+        surface_ = SkSurfaces::WrapPixels(image_info, buffer_provider.provide(byte_size), row_bytes);
+    }
 }
 
 void Renderer::readPixel(void *buffer) const {
@@ -37,7 +57,7 @@ void Renderer::render(const Scene &scene) {
     auto canvas = surface_->getCanvas();
     canvas->clipRect(SkRect::MakeIWH(surface_->width(), surface_->height()));
 
-    if (parallel_) {
+    if (parallel_ && !useGpu_) {
         wait_group.add(1);
         marl::schedule([=] {
             defer(wait_group.done());
@@ -58,7 +78,7 @@ void Renderer::render(const Scene &scene) {
 #endif
     sk_sp<SkPicture> picture = recorder.finishRecordingAsPicture();
 
-    if (parallel_) {
+    if (parallel_ && !useGpu_) {
         wait_group.wait();
 
         constexpr uint8_t FACTOR = 4;
@@ -81,6 +101,22 @@ void Renderer::render(const Scene &scene) {
         wait_group.wait();
     } else {
         canvas->drawPicture(picture);
+        if (useGpu_) {
+            const auto recording = context_->recorder->snap();
+            MainGpuContext->insertRecording({recording.get()});
+            MainGpuContext->asyncRescaleAndReadPixels(surface_.get(), surface_->imageInfo(),
+                                                         SkIRect::MakeSize(surface_->imageInfo().dimensions()), SkImage::RescaleGamma::kSrc,
+                                                         SkImage::RescaleMode::kNearest,
+                                                         [](void* ctx,
+                                                            std::unique_ptr<const SkImage::AsyncReadResult> result) {
+                                                             if (result) {
+                                                                 auto output_pixmap = static_cast<SkPixmap*>(ctx);
+                                                                 memcpy(output_pixmap->writable_addr(), result->data(0),
+                                                                        output_pixmap->computeByteSize());
+                                                             }
+                                                         }, &context_->pixmap);
+            MainGpuContext->submit(SyncToCpu::kYes);
+        }
     }
 }
 

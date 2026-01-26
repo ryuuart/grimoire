@@ -62,7 +62,7 @@ void SigilTextPlugin::execute(TOP_Output *output, const OP_Inputs *inputs,
 
     // Prep renderer
     TDBuffer output_buffer{m_context};
-    Renderer renderer{Renderer::RenderConfig{texture_desc.width, texture_desc.height, true}, output_buffer};
+    Renderer renderer{Renderer::RenderConfig{texture_desc.width, texture_desc.height, false, true}, output_buffer};
 
     // Update the scene
     auto &text = scene_.text;

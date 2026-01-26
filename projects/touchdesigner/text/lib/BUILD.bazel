@@ -1,4 +1,24 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_library", "objc_library")
+
+cc_library(
+    name = "gpu",
+    hdrs = ["src/GpuUtils.h"],
+    includes = ["src"],
+)
+
+objc_library(
+    name = "metal_lib",
+    srcs = ["src/MetalGpuUtils.mm"],
+    sdk_frameworks = [
+        "Foundation",
+        "Metal",
+        "QuartzCore",
+    ],
+    deps = [
+        ":gpu",
+        "@skia//:graphite_native_metal",
+    ],
+)
 
 cc_library(
     name = "lib",
@@ -23,6 +43,7 @@ cc_library(
     includes = ["src"],
     visibility = ["//projects/touchdesigner/text:__subpackages__"],
     deps = [
+        ":gpu",
         "//libraries/touchdesigner/core",
         "@abseil-cpp//absl/container:flat_hash_map",
         "@abseil-cpp//absl/container:flat_hash_set",
@@ -34,5 +55,10 @@ cc_library(
         "@skia//:skshaper_harfbuzz",
         "@skia//:skshaper_unicode",
         "@skia//:skunicode_icu",
-    ],
+    ] + select({
+        "@platforms//os:macos": [
+            ":metal_lib",
+        ],
+        "//conditions:default": ["@skia//:graphite_native_vulkan"],
+    }),
 )

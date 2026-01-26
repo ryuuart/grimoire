@@ -67,6 +67,14 @@ http_archive(
     url = "https://github.com/sansumbrella/Choreograph/archive/34631980702f5d3745ac29d262712dd81b594ade.zip",
 )
 
+http_archive(
+    name = "metal_cpp",
+    build_file = "@//third_party/metal_cpp:metal_cpp.BUILD",
+    sha256 = "4df3c078b9aadcb516212e9cb03004cbc5ce9a3e9c068fa3144d021db585a3a4",
+    strip_prefix = "metal-cpp",
+    url = "https://developer.apple.com/metal/cpp/files/metal-cpp_26.zip",
+)
+
 git_repository(
     name = "tracy",
     build_file = "@//third_party/tracy:tracy.BUILD",

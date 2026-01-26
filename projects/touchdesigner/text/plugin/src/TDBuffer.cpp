@@ -9,7 +9,7 @@ TDBuffer::TDBuffer(TD::TOP_Context * context) : context_(context) {
 
 
 void *TDBuffer::provide(std::size_t size) {
-    buffer_ = context_->createOutputBuffer(size, TD::TOP_BufferFlags::Readable, nullptr);
+    buffer_ = context_->createOutputBuffer(size, TD::TOP_BufferFlags::None, nullptr);
 
     return buffer_->data;
 }
