@@ -4,6 +4,7 @@
 #include "TOP_CPlusPlusBase.h"
 #include "Typography.h"
 #include "TDBuffer.h"
+#include "external/+_repo_rules+marl/include/marl/event.h"
 #include "marl/scheduler.h"
 #include "marl/defer.h"
 
@@ -55,7 +56,6 @@ void SigilTextPlugin::getGeneralInfo(TOP_GeneralInfo *ginfo,
 void SigilTextPlugin::execute(TOP_Output *output, const OP_Inputs *inputs,
                               void *reserved) {
     static marl::Scheduler scheduler{marl::Scheduler::Config::allCores()};
-
     // Prep required data
     OP_TextureDesc texture_desc;
     output->getSuggestedOutputDesc(&texture_desc, nullptr);

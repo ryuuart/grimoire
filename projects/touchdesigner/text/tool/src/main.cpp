@@ -21,15 +21,20 @@
 #include "rules_cc/cc/runfiles/runfiles.h"
 #include "spdlog/spdlog.h"
 #include "tracy/Tracy.hpp"
-#include <client/TracyProfiler.hpp>
+#include "client/TracyProfiler.hpp"
 #include <cstring>
 #include <memory>
 #include <utility>
 #include "Window.h"
+#include "Scene.h"
+#include "Renderer.h"
+#include "TextSystem.h"
 
 using rules_cc::cc::runfiles::Runfiles;
 
 struct AppContext {
+    Scene scene;
+    std::unique_ptr<TextSystem> textSystem;
     ToolContext toolContext;
     SdlContext sdlContext;
     std::unique_ptr<Runfiles> runfiles;
@@ -127,6 +132,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
         window_size.first * pixelDensity, window_size.second * pixelDensity,
         appContext->toolContext);
     appContext->gui = std::make_unique<Gui>(appContext->toolContext);
+    appContext->textSystem = std::make_unique<TextSystem>(appContext->scene);
     *appstate = appContext;
 
     return SDL_APP_CONTINUE;
@@ -152,10 +158,24 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
 
     appContext->gui->draw();
 
-    appContext->canvas->prepare();
-    appContext->canvas->draw();
+    // appContext->canvas->prepare();
+    // appContext->canvas->draw();
+    auto& scene = appContext->scene;
+    scene.text.content.content = toolContext.content;
+    scene.text.style.fontSize = toolContext.fontSize;
+    scene.text.style.foregroundColor = {1.0, 1.0, 1.0, 1.0};
+    int window_width, window_height;
+    SDL_GetWindowSizeInPixels(window, &window_width, &window_height);
+    if (window_width <= 0 || window_height <= 0) {
+        window_width = 640;
+        window_height = 480;
+    }
+    Renderer renderer{{static_cast<uint32_t>(window_width), static_cast<uint32_t>(window_height), false, true}};
+    appContext->textSystem->update(window_width);
+    renderer.render(appContext->scene);
 
-    SkPixmap pixmap = appContext->canvas->getPixmap();
+    // SkPixmap pixmap = appContext->canvas->getPixmap();
+    SkPixmap pixmap = renderer.getPixmap();
     SdlDrawable::SdlDrawableDescriptor drawableDescriptor{
         .buffer = pixmap.addr(),
         .sizeInBytes = pixmap.computeByteSize(),

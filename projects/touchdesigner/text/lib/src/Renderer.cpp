@@ -19,6 +19,8 @@ Renderer::Renderer(const RenderConfig config) : parallel_(config.parallel), useG
     if (useGpu_) {
         context_->recorder = MainGpuContext->makeRecorder();
         surface_ = SkSurfaces::RenderTarget(context_->recorder.get(), image_info);
+        context_->bitmap.allocPixels(image_info);
+        context_->pixmap = context_->bitmap.pixmap();
     } else {
         surface_ = SkSurfaces::Raster(image_info);
     }
@@ -40,6 +42,10 @@ Renderer::Renderer(const RenderConfig config, BufferProvider &buffer_provider) :
     } else {
         surface_ = SkSurfaces::WrapPixels(image_info, buffer_provider.provide(byte_size), row_bytes);
     }
+}
+
+SkPixmap Renderer::getPixmap() {
+    return context_->pixmap;
 }
 
 void Renderer::readPixel(void *buffer) const {
@@ -67,16 +73,19 @@ void Renderer::render(const Scene &scene) {
         canvas->clear(0);
     }
 
-    SkPictureRecorder recorder;
-    SkCanvas* picture_canvas = recorder.beginRecording(SkRect::MakeIWH(surface_->width(), surface_->height()));
+    // SkPictureRecorder recorder;
+    // SkCanvas* picture_canvas = recorder.beginRecording(SkRect::MakeIWH(surface_->width(), surface_->height()));
 #ifdef USE_SKIA_SHAPED_TEXT
-    picture_canvas->drawTextBlob(scene.text.skiaShapedText.textBlob, 0, 0,
+    // picture_canvas->drawTextBlob(scene.text.skiaShapedText.textBlob, 0, 0,
+    //                      scene.text.skiaStyle.foregroundColor);
+    canvas->drawTextBlob(scene.text.skiaShapedText.textBlob, 0, 0,
                          scene.text.skiaStyle.foregroundColor);
 #endif
 #ifdef USE_SKIA_PARAGRAPH_TEXT
-    scene.text.skiaParagraphText.paragraph->paint(picture_canvas, 0, 0);
+    // scene.text.skiaParagraphText.paragraph->paint(picture_canvas, 0, 0);
+    scene.text.skiaParagraphText.paragraph->paint(canvas, 0, 0);
 #endif
-    sk_sp<SkPicture> picture = recorder.finishRecordingAsPicture();
+    // sk_sp<SkPicture> picture = recorder.finishRecordingAsPicture();
 
     if (parallel_ && !useGpu_) {
         wait_group.wait();
@@ -94,13 +103,13 @@ void Renderer::render(const Scene &scene) {
                     const sk_sp<SkSurface> tmp_surface = SkSurfaces::WrapPixels(pixmap.info(), pixmap.writable_addr(), pixmap.rowBytes());
                     auto tmp_canvas = tmp_surface->getCanvas();
                     tmp_canvas->clipRect(SkRect::MakeXYWH(i * TILE_SIZE.x, j * TILE_SIZE.y, TILE_SIZE.x, TILE_SIZE.y));
-                    tmp_canvas->drawPicture(picture);
+                    // tmp_canvas->drawPicture(picture);
                 });
             }
         }
         wait_group.wait();
     } else {
-        canvas->drawPicture(picture);
+        // canvas->drawPicture(picture);
         if (useGpu_) {
             const auto recording = context_->recorder->snap();
             MainGpuContext->insertRecording({recording.get()});

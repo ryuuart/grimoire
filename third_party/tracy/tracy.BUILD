@@ -21,8 +21,9 @@ cmake(
         "TRACY_ON_DEMAND": "ON",
     },
     generate_args = [
-        "-G Ninja",
+        "-G Ninja Multi-Config",
     ],
+    configuration = "Release",
     includes = [
         "public/client",
         "public/common",

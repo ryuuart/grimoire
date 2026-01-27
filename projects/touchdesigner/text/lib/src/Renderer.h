@@ -4,6 +4,7 @@
 #include "BufferProvider.h"
 #include "include/gpu/graphite/Context.h"
 #include "include/gpu/graphite/BackendTexture.h"
+#include "include/core/SkBitmap.h"
 
 class Renderer {
   public:
@@ -22,6 +23,7 @@ class Renderer {
     size_t byteSize() const;
     void render(const Scene &scene);
     void readPixel(void *buffer) const;
+    SkPixmap getPixmap();
 
   private:
     static constexpr SkColorType RENDERER_COLOR_TYPE = SkColorType::kBGRA_8888_SkColorType;
@@ -30,6 +32,7 @@ class Renderer {
       std::unique_ptr<skgpu::graphite::Recorder> recorder;
       skgpu::graphite::BackendTexture texture;
       SkPixmap pixmap;
+      SkBitmap bitmap;
     };
 
     SkSurfaceProps surface_props_;

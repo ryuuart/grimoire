@@ -21,6 +21,7 @@ cc_binary(
     ],
     deps = [
         "//libraries/touchdesigner/core",
+        "//projects/touchdesigner/text/lib",
         "@choreograph",
         "@glm",
         "@imgui",

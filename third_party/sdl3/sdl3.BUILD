@@ -2,16 +2,16 @@ load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
 
 filegroup(
     name = "all_srcs",
-    srcs = glob(["**"]),
+    srcs = glob(["**/*"]),
     visibility = ["//visibility:public"],
 )
 
 cmake(
     name = "sdl3",
     generate_args = [
-        "-G Ninja",
+        "-G Ninja Multi-Config",
     ],
-    includes = ["include"],
+    includes = ["include/SDL3"],
     lib_source = ":all_srcs",
     out_lib_dir = select({
         "@platforms//os:linux": "lib64",
@@ -21,5 +21,6 @@ cmake(
         "@platforms//os:linux": ["libSDL3.so", "libSDL3.so.0"],
         "@platforms//os:macos": ["libSDL3.0.dylib"],
     }),
+    out_include_dir = "include",
     visibility = ["//visibility:public"],
 )
