@@ -96,7 +96,7 @@ class Schedule : public benchmark::Fixture {
   }
 
 protected:
-  std::unique_ptr<Scene> scene_;
+  std::shared_ptr<Scene> scene_;
   std::unique_ptr<TextSystem> textSystem_;
   const std::u8string BENCHMARK_PARAGRAPH_CONTENT = u8R"stress(
 The fundamental challenge of rendering begins when the Unicode Bidirectional Algorithm (UBA)

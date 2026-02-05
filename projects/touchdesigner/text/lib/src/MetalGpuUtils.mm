@@ -9,22 +9,14 @@
 #include <Metal/Metal.h>
 using namespace skgpu::graphite;
 
-struct Initializer {
+std::unique_ptr<Context> MakeGpuContext() {
     id<MTLDevice> device = MTLCreateSystemDefaultDevice();
     id<MTLCommandQueue> queue = [device newCommandQueue];
     MtlBackendContext mtl_backend_context{};
     ContextOptions context_options;
 
-    Initializer() {
-        mtl_backend_context.fDevice.retain((__bridge CFTypeRef)device);
-        mtl_backend_context.fQueue.retain((__bridge CFTypeRef)queue);
-    }
-};
+    mtl_backend_context.fDevice.retain((__bridge CFTypeRef)device);
+    mtl_backend_context.fQueue.retain((__bridge CFTypeRef)queue);
 
-std::unique_ptr<Context> MakeGpuContext() {
-    static Initializer initializer;
-
-    return ContextFactory::MakeMetal(initializer.mtl_backend_context, initializer.context_options);
+    return ContextFactory::MakeMetal(mtl_backend_context, context_options);
 }
-
-std::unique_ptr<Context> MainGpuContext = MakeGpuContext();

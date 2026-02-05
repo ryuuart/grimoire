@@ -23,12 +23,14 @@ objc_library(
 cc_library(
     name = "lib",
     srcs = [
+        "src/BitmapBuffer.cpp",
         "src/Renderer.cpp",
         "src/TextSystem.cpp",
         "src/Typography.cpp",
     ],
     hdrs = [
-        "src/BufferProvider.h",
+        "src/BitmapBuffer.h",
+        "src/Buffer.h",
         "src/Components.h",
         "src/Renderer.h",
         "src/Scene.h",

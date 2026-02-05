@@ -1,7 +1,7 @@
 #pragma once
+#include "Buffer.h"
 #include "Scene.h"
 #include "include/core/SkSurface.h"
-#include "BufferProvider.h"
 #include "include/gpu/graphite/Context.h"
 #include "include/gpu/graphite/BackendTexture.h"
 #include "include/core/SkBitmap.h"
@@ -9,36 +9,29 @@
 class Renderer {
   public:
     struct RenderConfig {
-      uint32_t width;
-      uint32_t height;
-      bool parallel{false};
-      bool useGpu{false};
+      uint32_t initialWidth;
+      uint32_t initialHeight;
     };
 
-    explicit Renderer(RenderConfig);
-    Renderer(RenderConfig, BufferProvider&);
+    enum class Status {
+      RENDER_IN_PROGRESS,
+      RENDER_READY,
+    };
 
-    uint32_t width() const;
-    uint32_t height() const;
-    size_t byteSize() const;
-    void render(const Scene &scene);
-    void readPixel(void *buffer) const;
-    SkPixmap getPixmap();
+    Renderer(RenderConfig config);
+    ~Renderer();
+
+    SkImageInfo imageInfo() const;
+    Status getStatus() const;
+    void startRender(::Buffer& buffer, const Scene &scene);
+    void resize(uint32_t width, uint32_t height);
 
   private:
-    static constexpr SkColorType RENDERER_COLOR_TYPE = SkColorType::kBGRA_8888_SkColorType;
+    static constexpr SkColorType RENDERER_COLOR_TYPE = kBGRA_8888_SkColorType;
 
-    struct GpuContext {
-      std::unique_ptr<skgpu::graphite::Recorder> recorder;
-      skgpu::graphite::BackendTexture texture;
-      SkPixmap pixmap;
-      SkBitmap bitmap;
-    };
-
-    SkSurfaceProps surface_props_;
+    SkSurfaceProps surfaceProps_;
     sk_sp<SkSurface> surface_;
-    std::unique_ptr<GpuContext> context_{std::make_unique<GpuContext>()};
-
-    bool parallel_;
-    bool useGpu_;
+    SkImageInfo imageInfo_;
+    std::unique_ptr<skgpu::graphite::Context> gpuContext_;
+    std::unique_ptr<skgpu::graphite::Recorder> recorder_;
 };

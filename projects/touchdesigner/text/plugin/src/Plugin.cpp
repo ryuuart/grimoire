@@ -1,5 +1,10 @@
 #include "Plugin.h"
+
+#include <future>
+
+#include "BitmapBuffer.h"
 #include "CPlusPlus_Common.h"
+#include "Renderer.h"
 #include "Renderer.h"
 #include "TOP_CPlusPlusBase.h"
 #include "Typography.h"
@@ -55,14 +60,9 @@ void SigilTextPlugin::getGeneralInfo(TOP_GeneralInfo *ginfo,
 
 void SigilTextPlugin::execute(TOP_Output *output, const OP_Inputs *inputs,
                               void *reserved) {
-    static marl::Scheduler scheduler{marl::Scheduler::Config::allCores()};
     // Prep required data
     OP_TextureDesc texture_desc;
     output->getSuggestedOutputDesc(&texture_desc, nullptr);
-
-    // Prep renderer
-    TDBuffer output_buffer{m_context};
-    Renderer renderer{Renderer::RenderConfig{texture_desc.width, texture_desc.height, false, true}, output_buffer};
 
     // Update the scene
     auto &text = scene_.text;
@@ -72,27 +72,42 @@ void SigilTextPlugin::execute(TOP_Output *output, const OP_Inputs *inputs,
     text.style.foregroundColor = {foreground_color.r, foreground_color.g, foreground_color.b, foreground_color.a};
     text.content.content = parameters_.evalContent(inputs);
 
-    std::thread thread([&] {
-        scheduler.bind();
-        defer(scheduler.unbind());
+    textSystem_->update(texture_desc.width);
 
-        textSystem_->update(renderer.width());
+    if (renderer_.imageInfo().width() != texture_desc.width || renderer_.imageInfo().height() != texture_desc.height) {
+        renderer_.resize(texture_desc.width, texture_desc.height);
+        backBuffer_ = std::make_unique<TDBuffer>(
+                m_context, renderer_.imageInfo().computeByteSize(renderer_.imageInfo().minRowBytes()),
+                renderer_.imageInfo().minRowBytes()
+        );
 
-        // Render
-        renderer.render(scene_);
-    });
+        while (renderer_.getStatus() != Renderer::Status::RENDER_READY) {}
+        renderer_.startRender(*backBuffer_, scene_);
+        while (renderer_.getStatus() != Renderer::Status::RENDER_READY) {}
+    }
 
-    thread.join();
+    if (renderer_.getStatus() == Renderer::Status::RENDER_READY) {
+        frontBuffer_ = std::move(backBuffer_);
 
-    // Upload the texture
-    TOP_UploadInfo uploadInfo = {};
-    uploadInfo.textureDesc.width = renderer.width();
-    uploadInfo.textureDesc.height = renderer.height();
-    uploadInfo.textureDesc.pixelFormat = OP_PixelFormat::BGRA8Fixed;
-    uploadInfo.textureDesc.texDim = OP_TexDim::e2D;
-    uploadInfo.firstPixel = TOP_FirstPixel::TopLeft;
-    uploadInfo.colorBufferIndex = 0;
-    output->uploadBuffer(output_buffer.useTOPBuffer(), uploadInfo, nullptr);
+        // Upload the texture
+        TOP_UploadInfo uploadInfo = {};
+        uploadInfo.textureDesc.width = renderer_.imageInfo().width();
+        uploadInfo.textureDesc.height = renderer_.imageInfo().height();
+        uploadInfo.textureDesc.pixelFormat = OP_PixelFormat::BGRA8Fixed;
+        uploadInfo.textureDesc.texDim = OP_TexDim::e2D;
+        uploadInfo.firstPixel = TOP_FirstPixel::TopLeft;
+        uploadInfo.colorBufferIndex = 0;
+        output->uploadBuffer(frontBuffer_->useTOPBuffer(), uploadInfo, nullptr);
+
+        // Prep renderer
+        backBuffer_ = std::make_unique<TDBuffer>(
+            m_context, renderer_.imageInfo().computeByteSize(renderer_.imageInfo().minRowBytes()),
+            renderer_.imageInfo().minRowBytes()
+        );
+
+        // Start new render
+        renderer_.startRender(*backBuffer_, scene_);
+    }
 }
 
 void SigilTextPlugin::setupParameters(OP_ParameterManager *manager,

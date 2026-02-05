@@ -3,19 +3,19 @@
   <component name="BlazeCTargetInfoService">
     <infoMap>
       <entry key="//libraries/touchdesigner/core:core">
-        <TargetInfo compilerVersion="Apple clang version 17.0.0 (clang-1700.6.3.2)&#10;Target: arm64-apple-darwin25.1.0&#10;Thread model: posix&#10;InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin&#10;" configurationId="//libraries/touchdesigner/core:core" />
+        <TargetInfo compilerVersion="Apple clang version 17.0.0 (clang-1700.6.3.2)&#10;Target: arm64-apple-darwin25.2.0&#10;Thread model: posix&#10;InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin&#10;" configurationId="//libraries/touchdesigner/core:core" />
       </entry>
       <entry key="//projects/touchdesigner/text/benchmarks:text_rendering">
-        <TargetInfo compilerVersion="Apple clang version 17.0.0 (clang-1700.6.3.2)&#10;Target: arm64-apple-darwin25.1.0&#10;Thread model: posix&#10;InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin&#10;" configurationId="//projects/touchdesigner/text/benchmarks:text_rendering" />
+        <TargetInfo compilerVersion="Apple clang version 17.0.0 (clang-1700.6.3.2)&#10;Target: arm64-apple-darwin25.2.0&#10;Thread model: posix&#10;InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin&#10;" configurationId="//projects/touchdesigner/text/benchmarks:text_rendering" />
       </entry>
       <entry key="//projects/touchdesigner/text/lib:lib">
-        <TargetInfo compilerVersion="Apple clang version 17.0.0 (clang-1700.6.3.2)&#10;Target: arm64-apple-darwin25.1.0&#10;Thread model: posix&#10;InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin&#10;" configurationId="//projects/touchdesigner/text/lib:lib" />
+        <TargetInfo compilerVersion="Apple clang version 17.0.0 (clang-1700.6.3.2)&#10;Target: arm64-apple-darwin25.2.0&#10;Thread model: posix&#10;InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin&#10;" configurationId="//projects/touchdesigner/text/lib:lib" />
       </entry>
       <entry key="//projects/touchdesigner/text/plugin:lib">
-        <TargetInfo compilerVersion="Apple clang version 17.0.0 (clang-1700.6.3.2)&#10;Target: arm64-apple-darwin25.1.0&#10;Thread model: posix&#10;InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin&#10;" configurationId="//projects/touchdesigner/text/plugin:lib" />
+        <TargetInfo compilerVersion="Apple clang version 17.0.0 (clang-1700.6.3.2)&#10;Target: arm64-apple-darwin25.2.0&#10;Thread model: posix&#10;InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin&#10;" configurationId="//projects/touchdesigner/text/plugin:lib" />
       </entry>
       <entry key="//projects/touchdesigner/text/tool:tool">
-        <TargetInfo compilerVersion="Apple clang version 17.0.0 (clang-1700.6.3.2)&#10;Target: arm64-apple-darwin25.1.0&#10;Thread model: posix&#10;InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin&#10;" configurationId="//projects/touchdesigner/text/tool:tool" />
+        <TargetInfo compilerVersion="Apple clang version 17.0.0 (clang-1700.6.3.2)&#10;Target: arm64-apple-darwin25.2.0&#10;Thread model: posix&#10;InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin&#10;" configurationId="//projects/touchdesigner/text/tool:tool" />
       </entry>
     </infoMap>
   </component>

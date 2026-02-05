@@ -4,4 +4,4 @@
 #pragma once
 #include "include/gpu/graphite/Context.h"
 
-extern std::unique_ptr<skgpu::graphite::Context> MainGpuContext;
+std::unique_ptr<skgpu::graphite::Context> MakeGpuContext();

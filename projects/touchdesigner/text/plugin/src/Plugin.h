@@ -1,8 +1,11 @@
 #pragma once
 #include "Parameters.h"
+#include "Renderer.h"
 #include "Scene.h"
+#include "TDBuffer.h"
 #include "TextSystem.h"
 #include "TOP_CPlusPlusBase.h"
+#include "external/skia+/src/gpu/graphite/Renderer.h"
 
 class SigilTextPlugin : public TD::TOP_CPlusPlusBase {
   public:
@@ -24,6 +27,10 @@ class SigilTextPlugin : public TD::TOP_CPlusPlusBase {
     const TD::OP_NodeInfo *m_info;
     Parameters parameters_;
 
+    std::unique_ptr<TDBuffer> backBuffer_;
+    std::unique_ptr<TDBuffer> frontBuffer_;
+
     Scene scene_;
+    Renderer renderer_{{1, 1}};
     std::unique_ptr<TextSystem> textSystem_;
 };

@@ -25,10 +25,13 @@
 #include <cstring>
 #include <memory>
 #include <utility>
+
+#include "BitmapBuffer.h"
 #include "Window.h"
 #include "Scene.h"
 #include "Renderer.h"
 #include "TextSystem.h"
+#include "include/core/SkColorSpace.h"
 
 using rules_cc::cc::runfiles::Runfiles;
 
@@ -37,6 +40,10 @@ struct AppContext {
     std::unique_ptr<TextSystem> textSystem;
     ToolContext toolContext;
     SdlContext sdlContext;
+    uint8_t current_buffer_id {0};
+    std::array<std::unique_ptr<BitmapBuffer>, 2> buffers;
+    BitmapBuffer* front_buffer;
+    Renderer renderer {{1, 1}};
     std::unique_ptr<Runfiles> runfiles;
     std::unique_ptr<Canvas> canvas;
     std::unique_ptr<Gui> gui;
@@ -133,6 +140,16 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
         appContext->toolContext);
     appContext->gui = std::make_unique<Gui>(appContext->toolContext);
     appContext->textSystem = std::make_unique<TextSystem>(appContext->scene);
+    appContext->renderer.resize(
+        static_cast<uint32_t>(window_size.first * pixelDensity), static_cast<uint32_t>(window_size.second * pixelDensity)
+    );
+    appContext->buffers[0] = std::make_unique<BitmapBuffer>(
+        SkImageInfo::MakeN32Premul(window_size.first * pixelDensity, window_size.second * pixelDensity).makeColorType(kBGRA_8888_SkColorType)
+    );
+    appContext->buffers[1] = std::make_unique<BitmapBuffer>(
+        SkImageInfo::MakeN32Premul(window_size.first * pixelDensity, window_size.second * pixelDensity).makeColorType(kBGRA_8888_SkColorType)
+    );
+    appContext->front_buffer = appContext->buffers[appContext->current_buffer_id].get();
     *appstate = appContext;
 
     return SDL_APP_CONTINUE;
@@ -170,12 +187,17 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
         window_width = 640;
         window_height = 480;
     }
-    Renderer renderer{{static_cast<uint32_t>(window_width), static_cast<uint32_t>(window_height), false, true}};
-    appContext->textSystem->update(window_width);
-    renderer.render(appContext->scene);
 
-    // SkPixmap pixmap = appContext->canvas->getPixmap();
-    SkPixmap pixmap = renderer.getPixmap();
+    appContext->textSystem->update(window_width);
+
+    if (appContext->renderer.getStatus() == Renderer::Status::RENDER_READY) {
+        appContext->front_buffer = appContext->buffers[appContext->current_buffer_id].get();
+
+        appContext->current_buffer_id = (appContext->current_buffer_id + 1) % 2;
+        appContext->renderer.startRender(*appContext->buffers[appContext->current_buffer_id], appContext->scene);
+    }
+
+    SkPixmap pixmap = appContext->front_buffer->getPixmap();
     SdlDrawable::SdlDrawableDescriptor drawableDescriptor{
         .buffer = pixmap.addr(),
         .sizeInBytes = pixmap.computeByteSize(),
@@ -241,6 +263,16 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
         int width, height;
         width = event->window.data1;
         height = event->window.data2;
+        appContext->renderer.resize(
+            static_cast<uint32_t>(width * pixelDensity), static_cast<uint32_t>(height * pixelDensity)
+        );
+        appContext->buffers[0] = std::make_unique<BitmapBuffer>(
+            SkImageInfo::MakeN32Premul(width * pixelDensity, height * pixelDensity).makeColorType(kBGRA_8888_SkColorType)
+        );
+        appContext->buffers[1] = std::make_unique<BitmapBuffer>(
+            SkImageInfo::MakeN32Premul(width * pixelDensity, height * pixelDensity).makeColorType(kBGRA_8888_SkColorType)
+        );
+        appContext->front_buffer = appContext->buffers[appContext->current_buffer_id].get();
         appContext->canvas->updateSize(width * pixelDensity,
                                        height * pixelDensity);
         break;
@@ -256,8 +288,10 @@ void SDL_AppQuit(void *appstate, SDL_AppResult result) {
     spdlog::info("Quitting app...");
 
     AppContext *appContext = static_cast<AppContext *>(appstate);
+
     ImGui_ImplSDLGPU3_Shutdown();
     ImGui_ImplSDL3_Shutdown();
+
     SDL_WaitForGPUIdle(appContext->sdlContext.gpuDevice);
     SDL_DestroyGPUDevice(appContext->sdlContext.gpuDevice);
     SDL_DestroyWindow(appContext->sdlContext.window);
